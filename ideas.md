@@ -40,9 +40,17 @@
 - time of day you listen most
 - year over year stats
 - "wrapped style" image generator
+- similar songs: grab top songs that were listened too close to a selected song
 
 ### ability to view and build your own profile
 
 - idk ig im making a social media sight now
 - modify data access ability
 - show your favourite stats that you have
+
+# Pages 
+- Home page:
+  - If not logged in, prompt to
+  - 
+  - base stats
+    - the default web api shit?

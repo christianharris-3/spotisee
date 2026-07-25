@@ -1,0 +1,24 @@
+@import "constants.css";
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font: var(--font-body);
+  margin: 0;
+}
+
+.button-primary {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1280px;
+  height: 100%;
+  margin: auto;
+}
+
+.page {
+  margin: var(--space-5) var(--space-10);
+}
