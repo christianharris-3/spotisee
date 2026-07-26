@@ -1,5 +1,8 @@
 package com.spotisee.app.resources;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spotisee.app.dao.UploadDao;
+import com.spotisee.app.managers.UploadDataManager;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -13,10 +16,17 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+
 @Path("api/upload-data")
 @Produces(MediaType.APPLICATION_JSON)
 public class UploadDataResource {
+
     private static final Logger log = LoggerFactory.getLogger(UploadDataResource.class);
+    private final UploadDataManager uploadDataManager;
+
+    public UploadDataResource(UploadDao uploadDao) {
+        this.uploadDataManager = new UploadDataManager(uploadDao);
+    }
 
     @GET
     public Response listUploads() {
@@ -30,12 +40,7 @@ public class UploadDataResource {
     ) {
         log.info("File Uploaded {}", file);
         try (ZipInputStream zipInputStream = new ZipInputStream(file)) {
-
-            ZipEntry entry;
-
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                log.info("Entry name: {}", entry.getName());
-            }
+            uploadDataManager.storeZipFile(zipInputStream);
         } catch (IOException e) {
             return Response.status(400, "Error loading jsons from zip file").build();
         }

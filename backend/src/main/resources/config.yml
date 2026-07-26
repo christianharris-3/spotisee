@@ -7,9 +7,9 @@ server:
     - type: http
       port: 8081
 
-#database:
-#  driverClass: com.mysql.cj.jdbc.Driver
-#  user: chris
-#  password: password
-#  url: mysql://avnadmin:AVNS_68x7XDg8uck12gI6gG2@mysql-8f59b17-spotisee.a.aivencloud.com:13950/defaultdb?ssl-mode=REQUIRED
-#  maxSize: 10
+database:
+  driverClass: com.mysql.cj.jdbc.Driver
+  user: chris
+  password: password
+  url: jdbc:mysql://localhost:3306/Spotisee?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+  maxSize: 10
