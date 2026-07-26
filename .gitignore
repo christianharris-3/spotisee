@@ -1,4 +1,6 @@
 .idea
+*.zip
+
 
 backend/api_messing.py
 backend/temp.json

@@ -41,6 +41,8 @@
 - year over year stats
 - "wrapped style" image generator
 - similar songs: grab top songs that were listened too close to a selected song
+- songs timeline
+  - shows timeline of top artists etc over years
 
 ### ability to view and build your own profile
 
