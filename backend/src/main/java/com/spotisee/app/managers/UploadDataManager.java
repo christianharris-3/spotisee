@@ -22,7 +22,7 @@ public class UploadDataManager {
 
     public void storeZipFile(ZipInputStream zipInputStream) throws IOException {
 
-        uploadDao.createUpload(3L);
+        Long uploadId = uploadDao.createUpload(3L);
 
         ZipEntry entry;
 
@@ -31,7 +31,11 @@ public class UploadDataManager {
 
             if (entry.isDirectory()) continue;
             JsonNode json = objectMapper.readValue(zipInputStream, JsonNode.class);
-            log.info("File: {}", json);
+
+            for (JsonNode song : json) {
+                log.info("Song: {}", song);
+            }
+
         }
     }
 }

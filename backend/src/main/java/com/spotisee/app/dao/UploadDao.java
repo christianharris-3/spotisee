@@ -13,4 +13,10 @@ public interface UploadDao {
     @GetGeneratedKeys
     long createUpload(@Bind("userId") long userId);
 
+    @SqlUpdate("""
+        INSERT INTO Songs ()
+        VALUES ();
+    """)
+    void createSong();
+
 }
