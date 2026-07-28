@@ -1,7 +1,7 @@
 
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Uploads;
-DROP TABLE IF EXISTS Songs;
+DROP TABLE IF EXISTS UploadItems;
 
 
 CREATE TABLE Users(
@@ -14,15 +14,14 @@ CREATE TABLE Uploads(
     userId INT
 );
 
-CREATE TABLE Songs(
+CREATE TABLE UploadItems(
     songId INT PRIMARY KEY AUTO_INCREMENT,
-    uploadId INT,
+    uploadId INT NOT NULL,
 
     timestamp DATETIME NOT NULL,
-    username VARCHAR(255),
     platform VARCHAR(100),
-    msPlayed INT UNSIGNED,
-    country CHAR(50),
+    msPlayed INT UNSIGNED NOT NULL,
+    country CHAR(2),
     ipAddress VARCHAR(45),
     trackName VARCHAR(500),
     albumName VARCHAR(500),
@@ -31,11 +30,15 @@ CREATE TABLE Songs(
     episodeName VARCHAR(500),
     episodeShowName VARCHAR(500),
     spotifyEpisodeUri VARCHAR(255),
+    audiobookTitle VARCHAR(500),
+    audiobookUri VARCHAR(255),
+    audiobookChapterUri VARCHAR(255),
+    audiobookChapterTitle VARCHAR(500),
     reasonEnd VARCHAR(50),
     reasonStart VARCHAR(50),
     shuffle BOOLEAN,
     skipped BOOLEAN,
     offline BOOLEAN,
     offlineTimestamp DATETIME,
-    incognito_mode BOOLEAN
+    incognitoMode BOOLEAN
 );
