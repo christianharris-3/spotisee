@@ -1,0 +1,12 @@
+FROM maven:3.9-eclipse-temurin-17
+
+WORKDIR /app
+
+COPY pom.xml .
+
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn dependency:go-offline -B
+
+COPY src ./src
+
+CMD ["sh", "-c", "mvn package -DskipTests -B && java -jar target/Spotisee-0.1.jar server src/main/resources/config.docker.yml"]

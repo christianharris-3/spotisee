@@ -4,9 +4,16 @@ services:
 
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
 
     pull_policy: build
 
+    volumes:
+      - ./backend/src:/app/src
+      - spotisee-maven-cache:/root/.m2
+
   frontend:
     pull_policy: always
+
+volumes:
+  spotisee-maven-cache:
