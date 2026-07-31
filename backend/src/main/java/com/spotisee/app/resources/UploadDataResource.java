@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 
@@ -31,7 +30,6 @@ public class UploadDataResource {
     public UploadDataResource(UploadDao uploadDao, DataPreProcessingDao dataPreProcessingDao) {
         this.uploadDataManager = new UploadDataManager(uploadDao);
         this.dataPreprocessingManager = new DataPreprocessingManager(dataPreProcessingDao);
-
     }
 
     @GET

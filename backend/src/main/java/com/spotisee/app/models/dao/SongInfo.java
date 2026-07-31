@@ -5,8 +5,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class UploadedSong {
-    private LocalDateTime timestamp;
+public class SongInfo {
+    private long uploadId;
+    private LocalDateTime endTime;
     private int msPlayed;
     private String trackName;
     private String albumName;

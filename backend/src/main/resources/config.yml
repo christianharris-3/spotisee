@@ -13,3 +13,12 @@ database:
   password: ${MYSQL_PASSWORD:-spotisee-password}
   url: jdbc:mysql://database:3306/${MYSQL_DATABASE:-Spotisee}?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
   maxSize: 10
+
+logging:
+  level: INFO
+
+  loggers:
+    com.mycompany.app: INFO
+    org.glassfish.jersey.server: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.jdbi.v3.core.statement: DEBUG
