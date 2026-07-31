@@ -3,172 +3,238 @@ name: Build and deploy Spotisee
 on:
   push:
     branches:
-      - master
+      - "**"
 
 permissions:
   contents: read
   packages: write
 
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/christianharris-3/spotisee-backend
+  FRONTEND_IMAGE: ghcr.io/christianharris-3/spotisee-frontend
+
 concurrency:
-  group: spotisee-production
+  group: spotisee-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
-  changes:
-    name: Detect changed components
+  prepare:
+    name: Prepare image tag
     runs-on: ubuntu-latest
 
     outputs:
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-      deployment: ${{ steps.filter.outputs.deployment }}
+      image_tag: ${{ steps.tag.outputs.image_tag }}
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - name: Generate branch image tag
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
 
-      - name: Detect changed files
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            backend:
-              - "backend/**"
-              - ".github/workflows/deploy.yml"
+          IMAGE_TAG="$(printf '%s' "${GITHUB_REF_NAME}" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/[^a-z0-9._-]/-/g' \
+            | sed 's/^-*//' \
+            | cut -c1-128)"
 
-            frontend:
-              - "frontend/**"
-              - ".github/workflows/deploy.yml"
+          if [ -z "$IMAGE_TAG" ]; then
+            echo "Could not generate a valid image tag."
+            exit 1
+          fi
 
-            deployment:
-              - "compose.yml"
-              - ".github/workflows/deploy.yml"
+          echo "Using image tag: $IMAGE_TAG"
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
 
   build-backend:
-    name: Build backend image
-    needs: changes
-
-    if: needs.changes.outputs.backend == 'true'
+    name: Build backend
+    needs:
+      - prepare
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Log in to GHCR
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Buildx
+      - name: Configure Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and publish backend
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ghcr.io/christianharris-3/spotisee-backend:master
-            ghcr.io/christianharris-3/spotisee-backend:${{ github.sha }}
+            ${{ env.BACKEND_IMAGE }}:${{ needs.prepare.outputs.image_tag }}
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha,scope=spotisee-backend
           cache-to: type=gha,mode=max,scope=spotisee-backend
 
   build-frontend:
-    name: Build frontend image
-    needs: changes
-
-    if: needs.changes.outputs.frontend == 'true'
+    name: Build frontend
+    needs:
+      - prepare
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Log in to GHCR
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure Buildx
+      - name: Configure Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and publish frontend
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ghcr.io/christianharris-3/spotisee-frontend:master
-            ghcr.io/christianharris-3/spotisee-frontend:${{ github.sha }}
+            ${{ env.FRONTEND_IMAGE }}:${{ needs.prepare.outputs.image_tag }}
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha,scope=spotisee-frontend
           cache-to: type=gha,mode=max,scope=spotisee-frontend
 
   deploy:
-    name: Deploy production
+    name: Deploy master
     needs:
-      - changes
+      - prepare
       - build-backend
       - build-frontend
 
-    if: |
-      always() &&
-      needs.changes.result == 'success' &&
-      (
-        needs.build-backend.result == 'success' ||
-        needs.build-backend.result == 'skipped'
-      ) &&
-      (
-        needs.build-frontend.result == 'success' ||
-        needs.build-frontend.result == 'skipped'
-      ) &&
-      (
-        needs.changes.outputs.backend == 'true' ||
-        needs.changes.outputs.frontend == 'true' ||
-        needs.changes.outputs.deployment == 'true'
-      )
+    if: github.ref_name == 'master'
 
-    runs-on:
-      - self-hosted
-      - linux
-      - spotisee-production
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
 
     steps:
-      - name: Check out deployment configuration
-        uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v6
 
-      - name: Create deployment directory
-        run: mkdir -p /opt/spotisee
+      - name: Configure SSH
+        shell: bash
+        env:
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_SSH_HOST_KEY: ${{ secrets.SERVER_SSH_HOST_KEY }}
+        run: |
+          set -euo pipefail
 
-      - name: Install current Compose file
-        run: cp compose.yml /opt/spotisee/compose.yml
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          printf '%s\n' "$SERVER_SSH_KEY" > "$HOME/.ssh/spotisee"
+          chmod 600 "$HOME/.ssh/spotisee"
 
-      - name: Pull current images
-        working-directory: /opt/spotisee
-        run: docker compose pull backend frontend
+          printf '%s\n' "$SERVER_SSH_HOST_KEY" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
 
-      - name: Deploy
-        working-directory: /opt/spotisee
-        run: docker compose up -d --remove-orphans
+      - name: Create deployment directories
+        shell: bash
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          set -euo pipefail
 
-      - name: Show deployment status
-        working-directory: /opt/spotisee
-        run: docker compose ps
+          ssh \
+            -i "$HOME/.ssh/spotisee" \
+            -p "${SERVER_PORT:-22}" \
+            "${SERVER_USER}@${SERVER_HOST}" \
+            "mkdir -p /opt/spotisee/backend/src/main/resources"
 
-      - name: Remove unused images
-        run: docker image prune -f
+      - name: Copy deployment files
+        shell: bash
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          set -euo pipefail
+
+          scp \
+            -i "$HOME/.ssh/spotisee" \
+            -P "${SERVER_PORT:-22}" \
+            compose.yml \
+            "${SERVER_USER}@${SERVER_HOST}:/opt/spotisee/compose.yml"
+
+          scp \
+            -i "$HOME/.ssh/spotisee" \
+            -P "${SERVER_PORT:-22}" \
+            backend/src/main/resources/db.sql \
+            "${SERVER_USER}@${SERVER_HOST}:/opt/spotisee/backend/src/main/resources/db.sql"
+
+      - name: Log the server into GHCR
+        shell: bash
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          printf '%s' "$GHCR_TOKEN" |
+            ssh \
+              -i "$HOME/.ssh/spotisee" \
+              -p "${SERVER_PORT:-22}" \
+              "${SERVER_USER}@${SERVER_HOST}" \
+              "docker login ghcr.io --username '${{ github.actor }}' --password-stdin"
+
+      - name: Deploy application
+        shell: bash
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i "$HOME/.ssh/spotisee" \
+            -p "${SERVER_PORT:-22}" \
+            "${SERVER_USER}@${SERVER_HOST}" \
+            'set -e
+             cd /opt/spotisee
+
+             export BACKEND_TAG=master
+             export FRONTEND_TAG=master
+
+             docker compose pull backend frontend
+             docker compose up -d --remove-orphans
+             docker compose ps
+             docker image prune -f'
