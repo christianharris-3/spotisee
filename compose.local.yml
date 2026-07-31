@@ -1,0 +1,28 @@
+services:
+  backend:
+    image: spotisee-backend-local:development
+
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    pull_policy: build
+
+  frontend:
+    image: spotisee-frontend-local:development
+
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+
+    pull_policy: build
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - ./frontend:/app
+      - spotisee-frontend-node-modules:/app/node_modules
+
+volumes:
+  spotisee-frontend-node-modules:

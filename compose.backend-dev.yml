@@ -1,0 +1,12 @@
+services:
+  backend:
+    image: spotisee-backend-local:development
+
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    pull_policy: build
+
+  frontend:
+    pull_policy: always

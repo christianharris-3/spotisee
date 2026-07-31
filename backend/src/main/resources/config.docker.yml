@@ -1,0 +1,15 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+
+  adminConnectors:
+    - type: http
+      port: 8081
+
+database:
+  driverClass: com.mysql.cj.jdbc.Driver
+  user: spotisee
+  password: spotisee-password
+  url: jdbc:mysql://database:3306/Spotisee?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+  maxSize: 10
