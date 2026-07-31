@@ -21,19 +21,19 @@ public class MusicDataManager {
         this.songDataDao = songDataDao;
     }
 
-    public List<SongStats> collectSongStats(long uploadId, String start, String end) {
-        return this.songDataDao.collectSongStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end));
+    public List<SongStats> collectSongStats(long uploadId, String start, String end, int pageSize, int pageIndex) {
+        return this.songDataDao.collectSongStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex);
     }
 
-    public List<AlbumStats> collectAlbumStats(long uploadId, String start, String end) {
-        return this.songDataDao.collectAlbumStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end));
+    public List<AlbumStats> collectAlbumStats(long uploadId, String start, String end, int pageSize, int pageIndex) {
+        return this.songDataDao.collectAlbumStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex);
     }
 
-    public List<ArtistStats> collectArtistStats(long uploadId, String start, String end) {
-        return this.songDataDao.collectArtistStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end));
+    public List<ArtistStats> collectArtistStats(long uploadId, String start, String end, int pageSize, int pageIndex) {
+        return this.songDataDao.collectArtistStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex);
     }
 
-    public List<CombinedStats> collectAllStats(long uploadId, String start, String end) {
-        return this.songDataDao.collectAllStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end));
+    public List<CombinedStats> collectAllStats(long uploadId, String start, String end, int pageSize, int pageIndex) {
+        return this.songDataDao.collectAllStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex);
     }
 }
