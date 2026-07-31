@@ -1,4 +1,12 @@
+# syntax=docker/dockerfile:1
+
 FROM maven:3.9-eclipse-temurin-17
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        inotify-tools \
+        procps \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -8,5 +16,3 @@ RUN --mount=type=cache,target=/root/.m2 \
     mvn dependency:go-offline -B
 
 COPY src ./src
-
-CMD ["sh", "-c", "mvn package -DskipTests -B && java -jar target/Spotisee-0.1.jar server src/main/resources/config.docker.yml"]

@@ -10,9 +10,21 @@ services:
 
     volumes:
       - ./backend/src:/app/src
+      - ./backend/pom.xml:/app/pom.xml
       - spotisee-maven-cache:/root/.m2
 
+    command: >
+      sh -c "
+      while true; do
+        mvn package -DskipTests -B &&
+        pkill -f 'spotisee.jar' || true;
+        java -jar target/Spotisee-0.1.jar server src/main/resources/config.docker.yml &
+        inotifywait -r -e modify,create,delete,move src;
+      done
+      "
+
   frontend:
+    image: ghcr.io/christianharris-3/spotisee-frontend:master
     pull_policy: always
 
 volumes:
