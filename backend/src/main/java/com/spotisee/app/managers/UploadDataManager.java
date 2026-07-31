@@ -2,7 +2,6 @@ package com.spotisee.app.managers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.spotisee.app.dao.UploadDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +9,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class UploadDataManager {
     private static final Logger log = LoggerFactory.getLogger(UploadDataManager.class);
+
     private final UploadDao uploadDao;
     private final ObjectMapper objectMapper;
 
@@ -23,23 +24,32 @@ public class UploadDataManager {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void storeZipFile(ZipInputStream zipInputStream) throws IOException {
+    public long storeZipFile(ZipInputStream zipInputStream) throws IOException {
 
-        Long uploadId = uploadDao.createUpload(3L);
+        long uploadId = uploadDao.createUpload(3L);
 
         ZipEntry entry;
 
-        while ((entry = zipInputStream.getNextEntry()) != null) {
-            log.info("File loading: {}", entry.getName());
+        try {
+            while ((entry = zipInputStream.getNextEntry()) != null) {
 
-            if (entry.isDirectory()) continue;
-            JsonNode json = objectMapper.readValue(zipInputStream, JsonNode.class);
+                if (entry.isDirectory()) continue;
+                JsonNode json = objectMapper.readValue(zipInputStream, JsonNode.class);
 
-            for (JsonNode song : json) {
-                storeUploadItem(uploadId, song);
-                log.info("Song: {}", song);
+                log.info("Loading {} items from file: {}", json.size(), entry.getName());
+
+                for (JsonNode song : json) {
+                    storeUploadItem(uploadId, song);
+                }
+                log.info("Finished Loading {}", entry.getName());
+            }
+        } catch (IOException e) {
+            log.error("Thing threw an error : {} : {}", e.getMessage(), e.getLocalizedMessage());
+            if (!Objects.equals(e.getMessage(), "Stream closed")) {
+                throw e;
             }
         }
+        return uploadId;
     }
 
     private void storeUploadItem(long uploadId, JsonNode song) {

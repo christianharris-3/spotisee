@@ -111,6 +111,22 @@
       <version>2.22.1</version>
       <scope>compile</scope>
     </dependency>
+
+    <!-- Source: https://mvnrepository.com/artifact/org.immutables/value -->
+    <dependency>
+      <groupId>org.immutables</groupId>
+      <artifactId>value</artifactId>
+      <version>2.12.2</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Source: https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.46</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>

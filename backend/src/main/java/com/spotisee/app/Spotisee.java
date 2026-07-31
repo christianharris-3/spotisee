@@ -1,6 +1,7 @@
 package com.spotisee.app;
 
 import com.spotisee.app.config.AppConfiguration;
+import com.spotisee.app.dao.DataPreProcessingDao;
 import com.spotisee.app.dao.UploadDao;
 import com.spotisee.app.resources.LoginResource;
 import com.spotisee.app.resources.UploadDataResource;
@@ -28,8 +29,9 @@ public class Spotisee extends Application<AppConfiguration> {
         jdbi.installPlugin(new SqlObjectPlugin());
 
         UploadDao uploadDao = jdbi.onDemand(UploadDao.class);
+        DataPreProcessingDao dataPreProcessingDao = jdbi.onDemand(DataPreProcessingDao.class);
 
         environment.jersey().register(new LoginResource());
-        environment.jersey().register(new UploadDataResource(uploadDao));
+        environment.jersey().register(new UploadDataResource(uploadDao, dataPreProcessingDao));
     }
 }
