@@ -4,10 +4,10 @@ services:
     restart: unless-stopped
 
     environment:
-      MYSQL_DATABASE: Spotisee
-      MYSQL_USER: spotisee
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-Spotisee}
+      MYSQL_USER: ${MYSQL_USER:-spotisee}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-spotisee-password}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change-this-root-password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root-password}
 
     volumes:
       - spotisee-database:/var/lib/mysql
@@ -23,30 +23,22 @@ services:
       timeout: 5s
       retries: 20
 
-    networks:
-      - spotisee
-
   backend:
     image: ghcr.io/christianharris-3/spotisee-backend:${BACKEND_TAG:-master}
     restart: unless-stopped
+
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-Spotisee}
+      MYSQL_USER: ${MYSQL_USER:-spotisee}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-spotisee-password}
 
     depends_on:
       database:
         condition: service_healthy
 
-    expose:
-      - "8080"
-      - "8081"
-
-    networks:
-      - spotisee
-
   frontend:
     image: ghcr.io/christianharris-3/spotisee-frontend:${FRONTEND_TAG:-master}
     restart: unless-stopped
-
-    depends_on:
-      - backend
 
     ports:
       - "8088:80"
