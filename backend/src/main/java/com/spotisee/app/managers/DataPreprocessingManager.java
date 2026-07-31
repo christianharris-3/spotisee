@@ -1,7 +1,7 @@
 package com.spotisee.app.managers;
 
 import com.spotisee.app.dao.DataPreProcessingDao;
-import com.spotisee.app.models.dao.UploadedSong;
+import com.spotisee.app.models.dao.SongInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,8 @@ public class DataPreprocessingManager {
     }
 
     public void preProcessUpload(long uploadId) {
-        List<UploadedSong> uploadedSongs = dataPreProcessingDao.loadSongUploads(uploadId);
-        log.info("UPLOADED SONGS LIST SIZE: {}", uploadedSongs.size());
+        List<SongInfo> songInfos = dataPreProcessingDao.loadSongUploads(uploadId);
+
+        log.info("UPLOADED SONGS LIST SIZE: {}", songInfos.size());
     }
 }

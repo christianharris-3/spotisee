@@ -1,7 +1,8 @@
 
 DROP TABLE IF EXISTS Users;
-DROP TABLE IF EXISTS Uploads;
-DROP TABLE IF EXISTS UploadItems;
+DROP TABLE IF EXISTS Upload;
+DROP TABLE IF EXISTS UploadItem;
+DROP VIEW IF EXISTS SongView;
 
 
 CREATE TABLE Users(
@@ -9,13 +10,13 @@ CREATE TABLE Users(
     username VARCHAR(255)
 );
 
-CREATE TABLE Uploads(
+CREATE TABLE Upload(
     uploadId INT PRIMARY KEY AUTO_INCREMENT,
     userId INT
 );
 
-CREATE TABLE UploadItems(
-    songId INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE UploadItem(
+    uploadItemId INT PRIMARY KEY AUTO_INCREMENT,
     uploadId INT NOT NULL,
 
     timestamp DATETIME NOT NULL,
@@ -42,3 +43,13 @@ CREATE TABLE UploadItems(
     offlineTimestamp DATETIME,
     incognitoMode BOOLEAN
 );
+
+CREATE VIEW SongView AS
+    SELECT uploadId, timestamp as endTime, msPlayed, trackName, albumName, artistName, spotifyTrackUri
+        FROM UploadItem WHERE
+        (timestamp IS NOT NULL) AND
+        (msPlayed IS NOT NULL) AND
+        (trackName IS NOT NULL) AND
+        (albumName IS NOT NULL) AND
+        (artistName IS NOT NULL) AND
+        (spotifyTrackUri IS NOT NULL);

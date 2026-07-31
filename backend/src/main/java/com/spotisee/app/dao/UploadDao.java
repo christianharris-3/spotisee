@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 public interface UploadDao {
 
     @SqlUpdate("""
-        INSERT INTO Uploads (userId)
+        INSERT INTO Upload (userId)
         VALUES (:userId);
     """)
     @GetGeneratedKeys
     long createUpload(@Bind("userId") long userId);
 
     @SqlUpdate("""
-        INSERT INTO UploadItems (
+        INSERT INTO UploadItem (
             uploadId,
             timestamp,
             platform,
