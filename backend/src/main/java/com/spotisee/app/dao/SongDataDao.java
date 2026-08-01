@@ -38,12 +38,15 @@ public interface SongDataDao {
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)
-                GROUP BY trackName;
+                GROUP BY trackName
+                LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<SongStats> collectSongStats(
             @Bind("uploadId") long uploadId,
             @Bind("start") Timestamp start,
-            @Bind("end") Timestamp end
+            @Bind("end") Timestamp end,
+            @Bind("pageSize") int pageSize,
+            @Bind("pageOffset") int pageOffset
     );
 
     @RegisterBeanMapper(AlbumStats.class)
@@ -56,12 +59,15 @@ public interface SongDataDao {
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)
-                GROUP BY albumName;
+                GROUP BY albumName
+                LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<AlbumStats> collectAlbumStats(
             @Bind("uploadId") long uploadId,
             @Bind("start") Timestamp start,
-            @Bind("end") Timestamp end
+            @Bind("end") Timestamp end,
+            @Bind("pageSize") int pageSize,
+            @Bind("pageOffset") int pageOffset
     );
 
     @RegisterBeanMapper(ArtistStats.class)
@@ -73,12 +79,15 @@ public interface SongDataDao {
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)
-                GROUP BY artistName;
+                GROUP BY artistName
+                LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<ArtistStats> collectArtistStats(
             @Bind("uploadId") long uploadId,
             @Bind("start") Timestamp start,
-            @Bind("end") Timestamp end
+            @Bind("end") Timestamp end,
+            @Bind("pageSize") int pageSize,
+            @Bind("pageOffset") int pageOffset
     );
 
     @RegisterBeanMapper(CombinedStats.class)
@@ -90,12 +99,15 @@ public interface SongDataDao {
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)
-                GROUP BY uploadId;
+                GROUP BY uploadId
+                LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<CombinedStats> collectAllStats(
             @Bind("uploadId") long uploadId,
             @Bind("start") Timestamp start,
-            @Bind("end") Timestamp end
+            @Bind("end") Timestamp end,
+            @Bind("pageSize") int pageSize,
+            @Bind("pageOffset") int pageOffset
     );
 
 
