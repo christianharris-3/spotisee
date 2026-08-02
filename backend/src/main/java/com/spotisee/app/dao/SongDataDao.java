@@ -3,6 +3,7 @@ package com.spotisee.app.dao;
 import com.spotisee.app.models.dao.*;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 import java.sql.Timestamp;
@@ -29,16 +30,17 @@ public interface SongDataDao {
 
     @RegisterBeanMapper(SongStats.class)
     @SqlQuery("""
-                SELECT MIN(uploadId), trackName,
+                SELECT uploadId, trackName,
                 SUM(msPlayed) AS totalMsPlayed,
-                MIN(albumName) AS albumName,
-                MIN(artistName) AS artistName,
+                albumName,
+                artistName,
                 COUNT(*) AS count,
                 SUM(msPlayed >=  30000) AS listens
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)
-                GROUP BY trackName
+                GROUP BY uploadId, trackName, albumName, artistName
+                ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<SongStats> collectSongStats(
@@ -46,20 +48,23 @@ public interface SongDataDao {
             @Bind("start") Timestamp start,
             @Bind("end") Timestamp end,
             @Bind("pageSize") int pageSize,
-            @Bind("pageOffset") int pageOffset
+            @Bind("pageOffset") int pageOffset,
+            @Define("sortPrimary") String sortPrimary,
+            @Define("sortSecondary") String sortSecondary
     );
 
     @RegisterBeanMapper(AlbumStats.class)
     @SqlQuery("""
-                SELECT MIN(uploadId), albumName,
+                SELECT uploadId, albumName,
                 SUM(msPlayed) AS totalMsPlayed,
-                MIN(artistName) AS artistName,
+                artistName,
                 COUNT(*) AS count,
                 SUM(msPlayed >=  30000) AS listens
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)
-                GROUP BY albumName
+                GROUP BY uploadId, albumName, artistName
+                ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<AlbumStats> collectAlbumStats(
@@ -67,19 +72,22 @@ public interface SongDataDao {
             @Bind("start") Timestamp start,
             @Bind("end") Timestamp end,
             @Bind("pageSize") int pageSize,
-            @Bind("pageOffset") int pageOffset
+            @Bind("pageOffset") int pageOffset,
+            @Define("sortPrimary") String sortPrimary,
+            @Define("sortSecondary") String sortSecondary
     );
 
     @RegisterBeanMapper(ArtistStats.class)
     @SqlQuery("""
-                SELECT MIN(uploadId), artistName,
+                SELECT uploadId, artistName,
                 SUM(msPlayed) AS totalMsPlayed,
                 COUNT(*) AS count,
                 SUM(msPlayed >=  30000) AS listens
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)
-                GROUP BY artistName
+                GROUP BY uploadId, artistName
+                ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<ArtistStats> collectArtistStats(
@@ -87,7 +95,9 @@ public interface SongDataDao {
             @Bind("start") Timestamp start,
             @Bind("end") Timestamp end,
             @Bind("pageSize") int pageSize,
-            @Bind("pageOffset") int pageOffset
+            @Bind("pageOffset") int pageOffset,
+            @Define("sortPrimary") String sortPrimary,
+            @Define("sortSecondary") String sortSecondary
     );
 
     @RegisterBeanMapper(CombinedStats.class)
@@ -100,6 +110,7 @@ public interface SongDataDao {
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)
                 GROUP BY uploadId
+                ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<CombinedStats> collectAllStats(
@@ -107,7 +118,9 @@ public interface SongDataDao {
             @Bind("start") Timestamp start,
             @Bind("end") Timestamp end,
             @Bind("pageSize") int pageSize,
-            @Bind("pageOffset") int pageOffset
+            @Bind("pageOffset") int pageOffset,
+            @Define("sortPrimary") String sortPrimary,
+            @Define("sortSecondary") String sortSecondary
     );
 
 

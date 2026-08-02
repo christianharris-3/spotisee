@@ -17,13 +17,13 @@ import java.util.List;
 import static com.spotisee.app.config.Constants.TIMESTAMP_LOWER_BOUND;
 import static com.spotisee.app.config.Constants.TIMESTAMP_UPPER_BOUND;
 import static com.spotisee.app.config.Constants.PAGE_SIZE;
+import static com.spotisee.app.config.Constants.DEFAULT_SORT;
 
 @Path("api/aggregate/")
 @Produces(MediaType.APPLICATION_JSON)
 public class StatAggregationResource {
 
     private static final Logger log = LoggerFactory.getLogger(StatAggregationResource.class);
-
 
     private final MusicDataManager musicDataManager;
 
@@ -38,9 +38,10 @@ public class StatAggregationResource {
             @DefaultValue(TIMESTAMP_LOWER_BOUND) @QueryParam("start") String startDate,
             @DefaultValue(TIMESTAMP_UPPER_BOUND) @QueryParam("end") String endDate,
             @DefaultValue(PAGE_SIZE) @QueryParam("pageSize") int pageSize,
-            @DefaultValue("0") @QueryParam("pageIndex") int pageIndex
+            @DefaultValue("0") @QueryParam("pageIndex") int pageIndex,
+            @DefaultValue(DEFAULT_SORT) @QueryParam("sortBy") String sortBy
     ) {
-        List<SongStats> songStats = musicDataManager.collectSongStats(uploadId, startDate, endDate, pageSize, pageIndex);
+        List<SongStats> songStats = musicDataManager.collectSongStats(uploadId, startDate, endDate, pageSize, pageIndex, sortBy);
         return Response.ok(songStats).build();
     }
 
@@ -51,9 +52,10 @@ public class StatAggregationResource {
             @DefaultValue(TIMESTAMP_LOWER_BOUND) @QueryParam("start") String startDate,
             @DefaultValue(TIMESTAMP_UPPER_BOUND) @QueryParam("end") String endDate,
             @DefaultValue(PAGE_SIZE) @QueryParam("pageSize") int pageSize,
-            @DefaultValue("0") @QueryParam("pageIndex") int pageIndex
+            @DefaultValue("0") @QueryParam("pageIndex") int pageIndex,
+            @DefaultValue(DEFAULT_SORT) @QueryParam("sortBy") String sortBy
     ) {
-        List<AlbumStats> songStats = musicDataManager.collectAlbumStats(uploadId, startDate, endDate, pageSize, pageIndex);
+        List<AlbumStats> songStats = musicDataManager.collectAlbumStats(uploadId, startDate, endDate, pageSize, pageIndex, sortBy);
         return Response.ok(songStats).build();
     }
 
@@ -64,9 +66,10 @@ public class StatAggregationResource {
             @DefaultValue(TIMESTAMP_LOWER_BOUND) @QueryParam("start") String startDate,
             @DefaultValue(TIMESTAMP_UPPER_BOUND) @QueryParam("end") String endDate,
             @DefaultValue(PAGE_SIZE) @QueryParam("pageSize") int pageSize,
-            @DefaultValue("0") @QueryParam("pageIndex") int pageIndex
+            @DefaultValue("0") @QueryParam("pageIndex") int pageIndex,
+            @DefaultValue(DEFAULT_SORT) @QueryParam("sortBy") String sortBy
     ) {
-        List<ArtistStats> songStats = musicDataManager.collectArtistStats(uploadId, startDate, endDate, pageSize, pageIndex);
+        List<ArtistStats> songStats = musicDataManager.collectArtistStats(uploadId, startDate, endDate, pageSize, pageIndex, sortBy);
         return Response.ok(songStats).build();
     }
 
@@ -77,9 +80,10 @@ public class StatAggregationResource {
             @DefaultValue(TIMESTAMP_LOWER_BOUND) @QueryParam("start") String startDate,
             @DefaultValue(TIMESTAMP_UPPER_BOUND) @QueryParam("end") String endDate,
             @DefaultValue(PAGE_SIZE) @QueryParam("pageSize") int pageSize,
-            @DefaultValue("0") @QueryParam("pageIndex") int pageIndex
+            @DefaultValue("0") @QueryParam("pageIndex") int pageIndex,
+            @DefaultValue(DEFAULT_SORT) @QueryParam("sortBy") String sortBy
     ) {
-        List<CombinedStats> songStats = musicDataManager.collectAllStats(uploadId, startDate, endDate, pageSize, pageIndex);
+        List<CombinedStats> songStats = musicDataManager.collectAllStats(uploadId, startDate, endDate, pageSize, pageIndex, sortBy);
         return Response.ok(songStats).build();
     }
 }
