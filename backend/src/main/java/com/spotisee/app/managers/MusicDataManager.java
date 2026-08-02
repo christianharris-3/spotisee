@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
+
+import static com.spotisee.app.config.Constants.SORT_OPTIONS;
 
 public class MusicDataManager {
 
@@ -21,19 +24,42 @@ public class MusicDataManager {
         this.songDataDao = songDataDao;
     }
 
-    public List<SongStats> collectSongStats(long uploadId, String start, String end, int pageSize, int pageIndex) {
-        return this.songDataDao.collectSongStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex);
+    public List<SongStats> collectSongStats(long uploadId, String start, String end, int pageSize, int pageIndex, String sortBy) {
+        List<String> sortByList = getSortBy(sortBy);
+        return this.songDataDao.collectSongStats(
+                uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex, sortByList.get(0), sortByList.get(1)
+        );
     }
 
-    public List<AlbumStats> collectAlbumStats(long uploadId, String start, String end, int pageSize, int pageIndex) {
-        return this.songDataDao.collectAlbumStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex);
+    public List<AlbumStats> collectAlbumStats(long uploadId, String start, String end, int pageSize, int pageIndex, String sortBy) {
+        List<String> sortByList = getSortBy(sortBy);
+        return this.songDataDao.collectAlbumStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex, sortByList.get(0), sortByList.get(1));
     }
 
-    public List<ArtistStats> collectArtistStats(long uploadId, String start, String end, int pageSize, int pageIndex) {
-        return this.songDataDao.collectArtistStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex);
+    public List<ArtistStats> collectArtistStats(long uploadId, String start, String end, int pageSize, int pageIndex, String sortBy) {
+        List<String> sortByList = getSortBy(sortBy);
+        return this.songDataDao.collectArtistStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex, sortByList.get(0), sortByList.get(1));
     }
 
-    public List<CombinedStats> collectAllStats(long uploadId, String start, String end, int pageSize, int pageIndex) {
-        return this.songDataDao.collectAllStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex);
+    public List<CombinedStats> collectAllStats(long uploadId, String start, String end, int pageSize, int pageIndex, String sortBy) {
+        List<String> sortByList = getSortBy(sortBy);
+        return this.songDataDao.collectAllStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex, sortByList.get(0), sortByList.get(1));
+    }
+
+    private List<String> getSortBy(String sortBy) {
+        List<String> output = new java.util.ArrayList<>(List.of());
+        for (String splitItem : sortBy.split(",")) {
+            if (SORT_OPTIONS.contains(splitItem)) {
+                output.add(splitItem);
+            }
+        }
+        while (output.size() < 2) {
+            for (String item : SORT_OPTIONS) {
+                if (!output.contains(item)) {
+                    output.add(item);
+                }
+            }
+        }
+        return output;
     }
 }
