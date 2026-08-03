@@ -1,5 +1,6 @@
 
 DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS UserRole;
 DROP TABLE IF EXISTS Upload;
 DROP TABLE IF EXISTS UploadItem;
 DROP VIEW IF EXISTS SongView;
@@ -7,7 +8,15 @@ DROP VIEW IF EXISTS SongView;
 
 CREATE TABLE Users(
     userId INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(255)
+    username VARCHAR(255) NOT NULL,
+    passwordHash VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE UserRole(
+    userId INT,
+    role VARCHAR(255),
+    PRIMARY KEY (userId, role)
+
 );
 
 CREATE TABLE Upload(

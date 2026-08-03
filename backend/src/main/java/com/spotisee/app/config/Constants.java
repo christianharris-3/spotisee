@@ -12,4 +12,6 @@ public class Constants {
 
     public static final String DEFAULT_SORT = "totalMsPlayed";
     public static final Set<String> SORT_OPTIONS = Set.of("listens", "count", "totalMsPlayed");
+
+    public static final String ROLE_USER = "USER";
 }

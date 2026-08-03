@@ -43,15 +43,12 @@ public class UploadDataResource {
             @FormDataParam("file") InputStream file
     ) {
         log.info("File Uploaded {}", file);
-        long uploadId;
         try (ZipInputStream zipInputStream = new ZipInputStream(file)) {
-            uploadId = uploadDataManager.storeZipFile(zipInputStream);
+            uploadDataManager.storeZipFile(zipInputStream);
         } catch (IOException e) {
             log.error("throwing {}", e.getMessage());
             return Response.status(400, String.format("Error loading jsons from zip file %s", e.getMessage())).build();
         }
-
-        dataPreprocessingManager.preProcessUpload(uploadId);
 
         return Response.accepted().build();
     }
