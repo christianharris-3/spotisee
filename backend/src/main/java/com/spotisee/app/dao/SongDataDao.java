@@ -35,10 +35,12 @@ public interface SongDataDao {
                 albumName,
                 artistName,
                 COUNT(*) AS count,
-                SUM(msPlayed >=  30000) AS listens
+                SUM(msPlayed >=  30000) AS listens,
+                SUM(skipped) as skips
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
-                (:start < endTime) AND (endTime < :end)
+                (:start < endTime) AND (endTime < :end) AND
+                (trackName LIKE :searchTerm OR albumName LIKE :searchTerm OR artistName LIKE :searchTerm)
                 GROUP BY uploadId, trackName, albumName, artistName
                 ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
                 LIMIT :pageSize OFFSET :pageOffset;
@@ -47,6 +49,7 @@ public interface SongDataDao {
             @Bind("uploadId") long uploadId,
             @Bind("start") Timestamp start,
             @Bind("end") Timestamp end,
+            @Bind("searchTerm") String searchTerm,
             @Bind("pageSize") int pageSize,
             @Bind("pageOffset") int pageOffset,
             @Define("sortPrimary") String sortPrimary,
@@ -59,10 +62,12 @@ public interface SongDataDao {
                 SUM(msPlayed) AS totalMsPlayed,
                 artistName,
                 COUNT(*) AS count,
-                SUM(msPlayed >=  30000) AS listens
+                SUM(msPlayed >=  30000) AS listens,
+                SUM(skipped) as skips
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
-                (:start < endTime) AND (endTime < :end)
+                (:start < endTime) AND (endTime < :end) AND
+                (albumName LIKE :searchTerm OR artistName LIKE :searchTerm)
                 GROUP BY uploadId, albumName, artistName
                 ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
                 LIMIT :pageSize OFFSET :pageOffset;
@@ -71,6 +76,7 @@ public interface SongDataDao {
             @Bind("uploadId") long uploadId,
             @Bind("start") Timestamp start,
             @Bind("end") Timestamp end,
+            @Bind("searchTerm") String searchTerm,
             @Bind("pageSize") int pageSize,
             @Bind("pageOffset") int pageOffset,
             @Define("sortPrimary") String sortPrimary,
@@ -82,10 +88,12 @@ public interface SongDataDao {
                 SELECT uploadId, artistName,
                 SUM(msPlayed) AS totalMsPlayed,
                 COUNT(*) AS count,
-                SUM(msPlayed >=  30000) AS listens
+                SUM(msPlayed >=  30000) AS listens,
+                SUM(skipped) as skips
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
-                (:start < endTime) AND (endTime < :end)
+                (:start < endTime) AND (endTime < :end) AND
+                (artistName LIKE :searchTerm)
                 GROUP BY uploadId, artistName
                 ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
                 LIMIT :pageSize OFFSET :pageOffset;
@@ -94,6 +102,7 @@ public interface SongDataDao {
             @Bind("uploadId") long uploadId,
             @Bind("start") Timestamp start,
             @Bind("end") Timestamp end,
+            @Bind("searchTerm") String searchTerm,
             @Bind("pageSize") int pageSize,
             @Bind("pageOffset") int pageOffset,
             @Define("sortPrimary") String sortPrimary,
@@ -105,7 +114,8 @@ public interface SongDataDao {
                 SELECT uploadId,
                 SUM(msPlayed) AS totalMsPlayed,
                 COUNT(*) AS count,
-                SUM(msPlayed >=  30000) AS listens
+                SUM(msPlayed >=  30000) AS listens,
+                SUM(skipped) as skips
                 FROM SongView
                 WHERE (:uploadId = uploadId) AND
                 (:start < endTime) AND (endTime < :end)

@@ -11,4 +11,5 @@ public class SongStats {
     private long totalMsPlayed;
     private int count;
     private int listens;
+    private int skips;
 }

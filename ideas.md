@@ -8,6 +8,8 @@
   - sort data by date range
   - clump by artist/album
   - search by song/arist/album
+  - render colours of each box as Percentage of max num
+  - complex search
   - graphing system
     - select artists/albums/songs 
     - graph with control over selection of shit (make a cool system good gl, it was kinda confusing last time)
@@ -56,3 +58,4 @@
   - 
   - base stats
     - the default web api shit?
+	

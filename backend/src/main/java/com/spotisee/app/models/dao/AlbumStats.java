@@ -10,4 +10,5 @@ public class AlbumStats {
     private long totalMsPlayed;
     private int count;
     private int listens;
+    private int skips;
 }

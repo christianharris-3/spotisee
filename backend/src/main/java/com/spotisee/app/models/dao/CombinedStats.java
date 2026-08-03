@@ -8,4 +8,5 @@ public class CombinedStats {
     private long totalMsPlayed;
     private int count;
     private int listens;
+    private int skips;
 }
