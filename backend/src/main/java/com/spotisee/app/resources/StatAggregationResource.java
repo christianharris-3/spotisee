@@ -37,11 +37,12 @@ public class StatAggregationResource {
             @QueryParam("uploadId") long uploadId,
             @DefaultValue(TIMESTAMP_LOWER_BOUND) @QueryParam("start") String startDate,
             @DefaultValue(TIMESTAMP_UPPER_BOUND) @QueryParam("end") String endDate,
+            @DefaultValue("") @QueryParam("searchTerm") String searchTerm,
             @DefaultValue(PAGE_SIZE) @QueryParam("pageSize") int pageSize,
             @DefaultValue("0") @QueryParam("pageIndex") int pageIndex,
             @DefaultValue(DEFAULT_SORT) @QueryParam("sortBy") String sortBy
     ) {
-        List<SongStats> songStats = musicDataManager.collectSongStats(uploadId, startDate, endDate, pageSize, pageIndex, sortBy);
+        List<SongStats> songStats = musicDataManager.collectSongStats(uploadId, startDate, endDate, searchTerm, pageSize, pageIndex, sortBy);
         return Response.ok(songStats).build();
     }
 
@@ -51,11 +52,12 @@ public class StatAggregationResource {
             @QueryParam("uploadId") long uploadId,
             @DefaultValue(TIMESTAMP_LOWER_BOUND) @QueryParam("start") String startDate,
             @DefaultValue(TIMESTAMP_UPPER_BOUND) @QueryParam("end") String endDate,
+            @DefaultValue("") @QueryParam("searchTerm") String searchTerm,
             @DefaultValue(PAGE_SIZE) @QueryParam("pageSize") int pageSize,
             @DefaultValue("0") @QueryParam("pageIndex") int pageIndex,
             @DefaultValue(DEFAULT_SORT) @QueryParam("sortBy") String sortBy
     ) {
-        List<AlbumStats> songStats = musicDataManager.collectAlbumStats(uploadId, startDate, endDate, pageSize, pageIndex, sortBy);
+        List<AlbumStats> songStats = musicDataManager.collectAlbumStats(uploadId, startDate, endDate, searchTerm, pageSize, pageIndex, sortBy);
         return Response.ok(songStats).build();
     }
 
@@ -65,11 +67,12 @@ public class StatAggregationResource {
             @QueryParam("uploadId") long uploadId,
             @DefaultValue(TIMESTAMP_LOWER_BOUND) @QueryParam("start") String startDate,
             @DefaultValue(TIMESTAMP_UPPER_BOUND) @QueryParam("end") String endDate,
+            @DefaultValue("") @QueryParam("searchTerm") String searchTerm,
             @DefaultValue(PAGE_SIZE) @QueryParam("pageSize") int pageSize,
             @DefaultValue("0") @QueryParam("pageIndex") int pageIndex,
             @DefaultValue(DEFAULT_SORT) @QueryParam("sortBy") String sortBy
     ) {
-        List<ArtistStats> songStats = musicDataManager.collectArtistStats(uploadId, startDate, endDate, pageSize, pageIndex, sortBy);
+        List<ArtistStats> songStats = musicDataManager.collectArtistStats(uploadId, startDate, endDate, searchTerm, pageSize, pageIndex, sortBy);
         return Response.ok(songStats).build();
     }
 

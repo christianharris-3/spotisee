@@ -45,7 +45,7 @@ CREATE TABLE UploadItem(
 );
 
 CREATE VIEW SongView AS
-    SELECT uploadId, timestamp as endTime, msPlayed, trackName, albumName, artistName, spotifyTrackUri
+    SELECT uploadId, timestamp as endTime, msPlayed, trackName, albumName, artistName, skipped, spotifyTrackUri
         FROM UploadItem WHERE
         (timestamp IS NOT NULL) AND
         (msPlayed IS NOT NULL) AND

@@ -24,26 +24,90 @@ public class MusicDataManager {
         this.songDataDao = songDataDao;
     }
 
-    public List<SongStats> collectSongStats(long uploadId, String start, String end, int pageSize, int pageIndex, String sortBy) {
+    public List<SongStats> collectSongStats(
+            long uploadId,
+            String start,
+            String end,
+            String searchTerm,
+            int pageSize,
+            int pageIndex,
+            String sortBy
+    ) {
         List<String> sortByList = getSortBy(sortBy);
         return this.songDataDao.collectSongStats(
-                uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex, sortByList.get(0), sortByList.get(1)
+                uploadId,
+                Timestamp.valueOf(start),
+                Timestamp.valueOf(end),
+                formatSearch(searchTerm),
+                pageSize,
+                pageSize * pageIndex,
+                sortByList.get(0),
+                sortByList.get(1)
         );
     }
 
-    public List<AlbumStats> collectAlbumStats(long uploadId, String start, String end, int pageSize, int pageIndex, String sortBy) {
+    public List<AlbumStats> collectAlbumStats(
+            long uploadId,
+            String start,
+            String end,
+            String searchTerm,
+            int pageSize,
+            int pageIndex,
+            String sortBy
+    ) {
         List<String> sortByList = getSortBy(sortBy);
-        return this.songDataDao.collectAlbumStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex, sortByList.get(0), sortByList.get(1));
+        return this.songDataDao.collectAlbumStats(
+                uploadId,
+                Timestamp.valueOf(start),
+                Timestamp.valueOf(end),
+                formatSearch(searchTerm),
+                pageSize,
+                pageSize * pageIndex,
+                sortByList.get(0),
+                sortByList.get(1)
+        );
     }
 
-    public List<ArtistStats> collectArtistStats(long uploadId, String start, String end, int pageSize, int pageIndex, String sortBy) {
+    public List<ArtistStats> collectArtistStats(
+            long uploadId,
+            String start,
+            String end,
+            String searchTerm,
+            int pageSize,
+            int pageIndex,
+            String sortBy
+    ) {
         List<String> sortByList = getSortBy(sortBy);
-        return this.songDataDao.collectArtistStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex, sortByList.get(0), sortByList.get(1));
+        return this.songDataDao.collectArtistStats(
+                uploadId,
+                Timestamp.valueOf(start),
+                Timestamp.valueOf(end),
+                formatSearch(searchTerm),
+                pageSize,
+                pageSize * pageIndex,
+                sortByList.get(0),
+                sortByList.get(1)
+        );
     }
 
-    public List<CombinedStats> collectAllStats(long uploadId, String start, String end, int pageSize, int pageIndex, String sortBy) {
+    public List<CombinedStats> collectAllStats(
+            long uploadId,
+            String start,
+            String end,
+            int pageSize,
+            int pageIndex,
+            String sortBy
+    ) {
         List<String> sortByList = getSortBy(sortBy);
-        return this.songDataDao.collectAllStats(uploadId, Timestamp.valueOf(start), Timestamp.valueOf(end), pageSize, pageSize * pageIndex, sortByList.get(0), sortByList.get(1));
+        return this.songDataDao.collectAllStats(
+                uploadId,
+                Timestamp.valueOf(start),
+                Timestamp.valueOf(end),
+                pageSize,
+                pageSize * pageIndex,
+                sortByList.get(0),
+                sortByList.get(1)
+        );
     }
 
     private List<String> getSortBy(String sortBy) {
@@ -61,5 +125,9 @@ public class MusicDataManager {
             }
         }
         return output;
+    }
+
+    private String formatSearch(String searchTerm) {
+        return "%"+searchTerm+"%";
     }
 }
