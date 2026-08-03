@@ -7,6 +7,7 @@ import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,4 +39,10 @@ public interface AuthDao {
             VALUES (:userId, :role);
             """)
     void addUserRole(@Bind("userId") long userId, @Bind("role") String role);
+
+    @SqlQuery("""
+            SELECT UploadId FROM Upload
+            WHERE :userId = userId;
+            """)
+    List<Long> getUserUploads(@Bind("userId") long userId);
 }

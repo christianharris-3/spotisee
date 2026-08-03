@@ -5,6 +5,7 @@ import com.spotisee.app.models.User;
 import com.spotisee.app.models.dao.UserFromDb;
 import io.dropwizard.auth.Authenticator;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -77,9 +78,13 @@ public class SpotiseeAuthenticator implements Authenticator<String, User> {
     }
 
     private Optional<User> validateToken(String token) {
-
-        JwtParser parser = Jwts.parser().decryptWith(key).build();
-        Claims claims = parser.parseSignedClaims(token).getPayload();
+        JwtParser parser = Jwts.parser().verifyWith(key).build();
+        Claims claims;
+        try {
+            claims = parser.parseSignedClaims(token).getPayload();
+        } catch (JwtException e) {
+            return Optional.empty();
+        }
         String username = claims.get("username", String.class);
         Date expiration = claims.getExpiration();
 

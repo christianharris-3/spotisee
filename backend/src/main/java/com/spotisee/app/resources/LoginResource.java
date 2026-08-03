@@ -5,6 +5,8 @@ import com.spotisee.app.dao.AuthDao;
 import com.spotisee.app.models.User;
 import com.spotisee.app.models.requests.LoginRequest;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -24,11 +26,7 @@ public class LoginResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("login")
-    public Response login(LoginRequest request) {
-        if (request == null) {
-            return Response.status(400, "No username/password given").build();
-        }
-
+    public Response login(@Valid @NotNull LoginRequest request) {
         Optional<String> token = spotiseeAuthenticator.generateToken(
             request.getUsername(),
             request.getPassword()
@@ -42,20 +40,11 @@ public class LoginResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("register")
-    public Response register(LoginRequest request) {
-        if (request == null) {
-            return Response.status(400, "No username/password given").build();
-        }
-
+    public Response register(@Valid @NotNull LoginRequest request) {
         if (!spotiseeAuthenticator.validUsername(request.getUsername())) {
             return Response.status(406, "Username Already Used").build();
         }
         spotiseeAuthenticator.register(request.getUsername(), request.getPassword());
         return Response.accepted().build();
-    }
-
-    @GET
-    public String hello() {
-        return "{\"message\":\"Hello World\"}";
     }
 }

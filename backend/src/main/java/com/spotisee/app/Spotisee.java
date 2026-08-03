@@ -7,12 +7,14 @@ import com.spotisee.app.dao.AuthDao;
 import com.spotisee.app.dao.DataPreProcessingDao;
 import com.spotisee.app.dao.SongDataDao;
 import com.spotisee.app.dao.UploadDao;
+import com.spotisee.app.exceptions.mapper.UnauthorisedExceptionMapper;
 import com.spotisee.app.models.User;
 import com.spotisee.app.resources.LoginResource;
 import com.spotisee.app.resources.StatAggregationResource;
 import com.spotisee.app.resources.UploadDataResource;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
+import io.dropwizard.auth.UnauthorizedHandler;
 import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Environment;
@@ -41,7 +43,6 @@ public class Spotisee extends Application<AppConfiguration> {
 
         UploadDao uploadDao = jdbi.onDemand(UploadDao.class);
         SongDataDao songDataDao = jdbi.onDemand(SongDataDao.class);
-        DataPreProcessingDao dataPreProcessingDao = jdbi.onDemand(DataPreProcessingDao.class);
         AuthDao authDao = jdbi.onDemand(AuthDao.class);
 
         // Auth
@@ -52,14 +53,16 @@ public class Spotisee extends Application<AppConfiguration> {
                         new OAuthCredentialAuthFilter.Builder<User>()
                                 .setAuthenticator(authenticator)
                                 .setPrefix("Bearer")
+                                .setUnauthorizedHandler(new UnauthorisedExceptionMapper())
                                 .buildAuthFilter()
                 )
         );
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
 
+
         // API endpoints
         environment.jersey().register(new LoginResource(authenticator));
-        environment.jersey().register(new StatAggregationResource(songDataDao));
-        environment.jersey().register(new UploadDataResource(uploadDao, dataPreProcessingDao));
+        environment.jersey().register(new StatAggregationResource(songDataDao, authDao));
+        environment.jersey().register(new UploadDataResource(uploadDao));
     }
 }
