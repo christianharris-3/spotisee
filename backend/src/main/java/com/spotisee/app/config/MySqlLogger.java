@@ -13,8 +13,8 @@ public class MySqlLogger implements SqlLogger {
     public void logBeforeExecution(StatementContext context) {
         String sql = context.getRenderedSql();
         sql = sql.replace("\n", "");
-        log.info("SQL CALL: {}", sql);
-        log.info("Bindings: {}", context.getBinding());
+//        log.info("SQL CALL: {}", sql);
+//        log.info("Bindings: {}", context.getBinding());
     }
 
 }

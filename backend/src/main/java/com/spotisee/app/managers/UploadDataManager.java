@@ -24,9 +24,9 @@ public class UploadDataManager {
         this.objectMapper = new ObjectMapper();
     }
 
-    public long storeZipFile(ZipInputStream zipInputStream) throws IOException {
+    public long storeZipFile(ZipInputStream zipInputStream, long userId) throws IOException {
 
-        long uploadId = uploadDao.createUpload(3L);
+        long uploadId = uploadDao.createUpload(userId);
 
         ZipEntry entry;
 
