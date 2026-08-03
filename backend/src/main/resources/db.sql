@@ -12,12 +12,13 @@ CREATE TABLE Users(
 
 CREATE TABLE Upload(
     uploadId INT PRIMARY KEY AUTO_INCREMENT,
-    userId INT
+    uploadName VARCHAR(255),
+    userId INT NOT NULL
 );
 
 CREATE TABLE UploadItem(
     uploadItemId INT PRIMARY KEY AUTO_INCREMENT,
-    uploadId INT NOT NULL,
+    uploadId BIGINT NOT NULL,
 
     timestamp DATETIME NOT NULL,
     platform VARCHAR(100),
@@ -53,3 +54,23 @@ CREATE VIEW SongView AS
         (albumName IS NOT NULL) AND
         (artistName IS NOT NULL) AND
         (spotifyTrackUri IS NOT NULL);
+
+CREATE TABLE GraphSelection (
+    graphSelectionId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    userId INT,
+    graphSelectionName VARCHAR(255),
+);
+
+CREATE TABLE SelectedItem (
+    selectedItemId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    graphSelectionId BIGINT NOT NULL,
+
+    trackName VARCHAR(500),
+    albumName VARCHAR(500),
+    artistName VARCHAR(500) NOT NULL,
+
+    startDate DATETIME NOT NULL,
+    endDate DATETIME NOT NULL,
+
+    graphType VARCHAR(20) NOT NULL
+);

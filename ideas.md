@@ -45,6 +45,7 @@
 - similar songs: grab top songs that were listened too close to a selected song
 - songs timeline
   - shows timeline of top artists etc over years
+- full song history view, methods to view, search etc your actually listen by listen song history
 
 ### ability to view and build your own profile
 
