@@ -5,6 +5,8 @@ import com.spotisee.app.dao.DataPreProcessingDao;
 import com.spotisee.app.dao.UploadDao;
 import com.spotisee.app.managers.DataPreprocessingManager;
 import com.spotisee.app.managers.UploadDataManager;
+import com.spotisee.app.models.User;
+import io.dropwizard.auth.Auth;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.zip.ZipInputStream;
 
 
@@ -24,12 +27,10 @@ public class UploadDataResource {
 
     private static final Logger log = LoggerFactory.getLogger(UploadDataResource.class);
     private final UploadDataManager uploadDataManager;
-    private final DataPreprocessingManager dataPreprocessingManager;
 
 
-    public UploadDataResource(UploadDao uploadDao, DataPreProcessingDao dataPreProcessingDao) {
+    public UploadDataResource(UploadDao uploadDao) {
         this.uploadDataManager = new UploadDataManager(uploadDao);
-        this.dataPreprocessingManager = new DataPreprocessingManager(dataPreProcessingDao);
     }
 
     @GET
@@ -39,19 +40,17 @@ public class UploadDataResource {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadZip(
+    public Response uploadZip(//@Auth User user,
             @FormDataParam("file") InputStream file
     ) {
+        User user = new User(1, "chris", Set.of());
         log.info("File Uploaded {}", file);
-        long uploadId;
         try (ZipInputStream zipInputStream = new ZipInputStream(file)) {
-            uploadId = uploadDataManager.storeZipFile(zipInputStream);
+            uploadDataManager.storeZipFile(zipInputStream, user.getUserId());
         } catch (IOException e) {
             log.error("throwing {}", e.getMessage());
             return Response.status(400, String.format("Error loading jsons from zip file %s", e.getMessage())).build();
         }
-
-        dataPreprocessingManager.preProcessUpload(uploadId);
 
         return Response.accepted().build();
     }
