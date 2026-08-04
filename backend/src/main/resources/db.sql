@@ -4,24 +4,32 @@ DROP TABLE IF EXISTS UserRole;
 DROP TABLE IF EXISTS Upload;
 DROP TABLE IF EXISTS UploadItem;
 DROP VIEW IF EXISTS SongView;
+DROP TABLE IF EXISTS Selection;
+DROP TABLE IF EXISTS SelectionItem;
 
 
 CREATE TABLE Users(
-    userId INT PRIMARY KEY AUTO_INCREMENT,
+    userId BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) NOT NULL,
     passwordHash VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE UserRole(
-    userId INT,
+    userId BIGINT,
     role VARCHAR(255),
     PRIMARY KEY (userId, role)
 
 );
 
 CREATE TABLE Upload(
+<<<<<<< Updated upstream
     uploadId INT PRIMARY KEY AUTO_INCREMENT,
     userId INT
+=======
+    uploadId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    uploadName VARCHAR(255),
+    userId INT NOT NULL
+>>>>>>> Stashed changes
 );
 
 CREATE TABLE UploadItem(
@@ -61,4 +69,29 @@ CREATE VIEW SongView AS
         (trackName IS NOT NULL) AND
         (albumName IS NOT NULL) AND
         (artistName IS NOT NULL) AND
+<<<<<<< Updated upstream
         (spotifyTrackUri IS NOT NULL);
+=======
+        (spotifyTrackUri IS NOT NULL);
+
+CREATE TABLE Selection (
+    selectionId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    userId BIGINT,
+    selectionTitle VARCHAR(60)
+);
+
+CREATE TABLE SelectionItem (
+    selectionItemId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    selectionId BIGINT NOT NULL,
+
+    trackName VARCHAR(500),
+    albumName VARCHAR(500),
+    artistName VARCHAR(500),
+
+    itemType VARCHAR(20) NOT NULL,
+    graphType VARCHAR(20) NOT NULL,
+
+    startDate DATETIME NOT NULL,
+    endDate DATETIME NOT NULL
+);
+>>>>>>> Stashed changes

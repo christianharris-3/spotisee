@@ -1,12 +1,8 @@
 package com.spotisee.app.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spotisee.app.dao.DataPreProcessingDao;
 import com.spotisee.app.dao.UploadDao;
-import com.spotisee.app.managers.DataPreprocessingManager;
 import com.spotisee.app.managers.UploadDataManager;
 import com.spotisee.app.models.User;
-import io.dropwizard.auth.Auth;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

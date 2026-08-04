@@ -45,4 +45,22 @@ public interface AuthDao {
             WHERE :userId = userId;
             """)
     List<Long> getUserUploads(@Bind("userId") long userId);
+
+    @SqlQuery("""
+            SELECT SelectionId FROM Selection
+            WHERE :userId = userId;
+            """)
+    List<Long> getUserSelections(@Bind("userId") long userId);
+
+    @SqlQuery("""
+            SELECT SelectionItem.selectionItemId
+            FROM Selection JOIN SelectionItem
+            ON Selection.selectionId = SelectionItem.selectionId
+            WHERE :userId = userId AND :selectionId = Selection.selectionId AND :selectionItemId = SelectionItem.selectionId;
+            """)
+    Optional<Long> checkUserSelectionItemMatches(
+            @Bind("userId") long userId,
+            @Bind("selectionId") long selectionId,
+            @Bind("selectionItemId") long selectionItemId
+    );
 }
