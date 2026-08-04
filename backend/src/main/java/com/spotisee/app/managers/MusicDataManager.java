@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
 
 import static com.spotisee.app.config.Constants.SORT_OPTIONS;
 
