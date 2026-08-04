@@ -53,8 +53,8 @@ public class SelectionManager {
                 artistName,
                 itemType,
                 graphType,
-                Timestamp.from(startDate),
-                Timestamp.from(endDate)
+                toTimestamp(startDate),
+                toTimestamp(endDate)
         );
     }
 
@@ -76,8 +76,8 @@ public class SelectionManager {
         selectionDao.updateSelectionItem(
                 selectionItemId,
                 graphType,
-                Timestamp.from(startDate),
-                Timestamp.from(endDate)
+                toTimestamp(startDate),
+                toTimestamp(endDate)
         );
     }
 
@@ -85,4 +85,10 @@ public class SelectionManager {
         selectionDao.deleteSelectionItem(selectionItemId);
     }
 
+    private Timestamp toTimestamp(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+        return Timestamp.from(instant);
+    }
 }

@@ -92,8 +92,8 @@ public interface SelectionDao {
     @SqlUpdate("""
             UPDATE SelectionItem
             SET graphType = COALESCE(:graphType, graphType),
-                startDate = COALESCE(:startDate, graphType),
-                endDate = COALESCE(:endDate, graphType)
+                startDate = COALESCE(:startDate, startDate),
+                endDate = COALESCE(:endDate, endDate)
             WHERE (:selectionItemId = selectionItemId);
             """)
     void updateSelectionItem(
