@@ -22,19 +22,14 @@ CREATE TABLE UserRole(
 );
 
 CREATE TABLE Upload(
-<<<<<<< Updated upstream
-    uploadId INT PRIMARY KEY AUTO_INCREMENT,
-    userId INT
-=======
     uploadId BIGINT PRIMARY KEY AUTO_INCREMENT,
     uploadName VARCHAR(255),
-    userId INT NOT NULL
->>>>>>> Stashed changes
+    userId BIGINT NOT NULL
 );
 
 CREATE TABLE UploadItem(
-    uploadItemId INT PRIMARY KEY AUTO_INCREMENT,
-    uploadId INT NOT NULL,
+    uploadItemId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    uploadId BIGINT NOT NULL,
 
     timestamp DATETIME NOT NULL,
     platform VARCHAR(100),
@@ -69,15 +64,13 @@ CREATE VIEW SongView AS
         (trackName IS NOT NULL) AND
         (albumName IS NOT NULL) AND
         (artistName IS NOT NULL) AND
-<<<<<<< Updated upstream
-        (spotifyTrackUri IS NOT NULL);
-=======
         (spotifyTrackUri IS NOT NULL);
 
 CREATE TABLE Selection (
     selectionId BIGINT PRIMARY KEY AUTO_INCREMENT,
     userId BIGINT,
-    selectionTitle VARCHAR(60)
+    selectionTitle VARCHAR(60),
+    graphType VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE SelectionItem (
@@ -89,9 +82,6 @@ CREATE TABLE SelectionItem (
     artistName VARCHAR(500),
 
     itemType VARCHAR(20) NOT NULL,
-    graphType VARCHAR(20) NOT NULL,
-
     startDate DATETIME NOT NULL,
     endDate DATETIME NOT NULL
 );
->>>>>>> Stashed changes

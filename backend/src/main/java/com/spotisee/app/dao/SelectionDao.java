@@ -16,15 +16,19 @@ import java.util.Optional;
 
 public interface SelectionDao {
     @SqlUpdate("""
-            INSERT INTO Selection (userId, selectionTitle)
-            VALUES (:userId, :selectionTitle);
+            INSERT INTO Selection (userId, selectionTitle, graphType)
+            VALUES (:userId, :selectionTitle, :graphType);
             """)
     @GetGeneratedKeys
-    long createSelection(@Bind("userId") long userId, @Bind("selectionTitle") String selectionTitle);
+    long createSelection(
+            @Bind("userId") long userId,
+            @Bind("selectionTitle") String selectionTitle,
+            @Bind("graphType") GraphType graphType
+    );
 
     @RegisterBeanMapper(Selection.class)
     @SqlQuery("""
-            SELECT selectionId, userId, selectionTitle
+            SELECT selectionId, userId, selectionTitle, graphType
             FROM Selection
             WHERE (:userId = userId);
             """)
@@ -32,7 +36,7 @@ public interface SelectionDao {
 
     @RegisterBeanMapper(Selection.class)
     @SqlQuery("""
-            SELECT selectionId, userId, selectionTitle
+            SELECT selectionId, userId, selectionTitle, graphType
             FROM Selection
             WHERE (:userId = userId) AND (:selectionId = selectionId);
             """)
@@ -40,13 +44,15 @@ public interface SelectionDao {
 
     @SqlUpdate("""
             UPDATE Selection
-            SET selectionTitle = :selectionTitle
+            SET selectionTitle = COALESCE(:selectionTitle, selectionTitle),
+                graphType = COALESCE(:graphType, graphType)
             WHERE (:userId = userId) AND (:selectionId = selectionId);
             """)
     void updateSelection(
             @Bind("userId") long userId,
             @Bind("selectionId") long selectionId,
-            @Bind("selectionTitle") String selectionTitle
+            @Bind("selectionTitle") String selectionTitle,
+            @Bind("graphType") GraphType graphType
     );
 
     @SqlUpdate("""
@@ -56,8 +62,8 @@ public interface SelectionDao {
     void deleteSelection(@Bind("userId") long userId, @Bind("selectionId") long selectionId);
 
     @SqlUpdate("""
-            INSERT INTO SelectionItem (selectionId, trackName, albumName, artistName, itemType, graphType, startDate, endDate)
-            VALUES (:selectionId, :trackName, :albumName, :artistName, :itemType, :graphType, :startDate, :endDate);
+            INSERT INTO SelectionItem (selectionId, trackName, albumName, artistName, itemType, startDate, endDate)
+            VALUES (:selectionId, :trackName, :albumName, :artistName, :itemType, :startDate, :endDate);
             """)
     @GetGeneratedKeys
     long createSelectionItem(
@@ -66,7 +72,6 @@ public interface SelectionDao {
             @Bind("albumName") String albumName,
             @Bind("artistName") String artistName,
             @Bind("itemType") ItemType itemType,
-            @Bind("graphType") GraphType graphType,
             @Bind("startDate") Timestamp startDate,
             @Bind("endDate") Timestamp endDate
     );
@@ -80,7 +85,6 @@ public interface SelectionDao {
                 SelectionItem.albumName,
                 SelectionItem.artistName,
                 SelectionItem.itemType,
-                SelectionItem.graphType,
                 SelectionItem.startDate,
                 SelectionItem.endDate
             FROM Selection JOIN SelectionItem
@@ -91,14 +95,12 @@ public interface SelectionDao {
 
     @SqlUpdate("""
             UPDATE SelectionItem
-            SET graphType = COALESCE(:graphType, graphType),
-                startDate = COALESCE(:startDate, startDate),
+            SET startDate = COALESCE(:startDate, startDate),
                 endDate = COALESCE(:endDate, endDate)
             WHERE (:selectionItemId = selectionItemId);
             """)
     void updateSelectionItem(
             @Bind("selectionItemId") long selectionItemId,
-            @Bind("graphType") GraphType graphType,
             @Bind("startDate") Timestamp startDate,
             @Bind("endDate") Timestamp endDate
     );

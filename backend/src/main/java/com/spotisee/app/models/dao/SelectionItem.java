@@ -14,7 +14,6 @@ public class SelectionItem {
     private String artistName;
 
     private String itemType;
-    private String graphType;
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;
