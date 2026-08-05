@@ -7,7 +7,6 @@ import java.time.Instant;
 
 @Data
 public class UpdateSelectionItemRequest {
-    private GraphType graphType;
     private Instant startDate;
     private Instant endDate;
 }

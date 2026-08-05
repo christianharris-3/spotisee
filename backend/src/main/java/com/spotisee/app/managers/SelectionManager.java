@@ -20,16 +20,16 @@ public class SelectionManager {
         this.selectionDao = selectionDao;
     }
 
-    public long createSelection(long userId, String selectionTitle) {
-        return selectionDao.createSelection(userId, selectionTitle);
+    public long createSelection(long userId, String selectionTitle, GraphType graphType) {
+        return selectionDao.createSelection(userId, selectionTitle, graphType);
     }
 
     public List<Selection> getSelections(long userId) {
         return selectionDao.getUserSelections(userId);
     }
 
-    public void updateSelection(long userId, long selectionId, String selectionTitle) {
-        selectionDao.updateSelection(userId, selectionId, selectionTitle);
+    public void updateSelection(long userId, long selectionId, String selectionTitle, GraphType graphType) {
+        selectionDao.updateSelection(userId, selectionId, selectionTitle, graphType);
     }
 
     public void deleteSelection(long userId, long selectionId) {
@@ -42,7 +42,6 @@ public class SelectionManager {
             String albumName,
             String artistName,
             ItemType itemType,
-            GraphType graphType,
             Instant startDate,
             Instant endDate
     ) {
@@ -52,7 +51,6 @@ public class SelectionManager {
                 albumName,
                 artistName,
                 itemType,
-                graphType,
                 toTimestamp(startDate),
                 toTimestamp(endDate)
         );
@@ -68,14 +66,14 @@ public class SelectionManager {
                 selectionId,
                 userId,
                 selection.get().getSelectionTitle(),
+                selection.get().getGraphType(),
                 selectionDao.getSelectionItems(userId, selectionId)
         );
     }
 
-    public void updateSelectionItem(long selectionItemId, GraphType graphType, Instant startDate, Instant endDate) {
+    public void updateSelectionItem(long selectionItemId, Instant startDate, Instant endDate) {
         selectionDao.updateSelectionItem(
                 selectionItemId,
-                graphType,
                 toTimestamp(startDate),
                 toTimestamp(endDate)
         );

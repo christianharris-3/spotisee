@@ -15,8 +15,6 @@ public class SelectionItemRequest {
     @NotNull
     private ItemType itemType;
     @NotNull
-    private GraphType graphType;
-    @NotNull
     private Instant startDate;
     @NotNull
     private Instant endDate;
