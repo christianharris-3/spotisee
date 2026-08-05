@@ -6,7 +6,6 @@ import com.spotisee.app.managers.SelectionManager;
 import com.spotisee.app.managers.UserValidationManager;
 import com.spotisee.app.models.User;
 import com.spotisee.app.models.dao.Selection;
-import com.spotisee.app.models.dao.SelectionItem;
 import com.spotisee.app.models.dao.SelectionResponse;
 import com.spotisee.app.models.requests.SelectionItemRequest;
 import com.spotisee.app.models.requests.SelectionRequest;
@@ -22,14 +21,14 @@ import java.util.List;
 
 @Path("api/selection/")
 @Produces(MediaType.APPLICATION_JSON)
-public class GraphSelectionResource {
+public class SelectionResource {
 
     private final SelectionManager selectionManager;
     private final UserValidationManager userValidationManager;
 
-    public GraphSelectionResource(SelectionDao selectionDao, AuthDao authDao) {
-        this.selectionManager = new SelectionManager(selectionDao);
-        this.userValidationManager = new UserValidationManager(authDao);
+    public SelectionResource(SelectionManager selectionManager, UserValidationManager userValidationManager) {
+        this.selectionManager = selectionManager;
+        this.userValidationManager = userValidationManager;
     }
 
     @POST

@@ -32,9 +32,9 @@ public class StatAggregationResource {
     private final MusicDataManager musicDataManager;
     private final UserValidationManager userValidationManager;
 
-    public StatAggregationResource(SongDataDao songDataDao, AuthDao authDao) {
-        this.musicDataManager = new MusicDataManager(songDataDao);
-        this.userValidationManager = new UserValidationManager(authDao);
+    public StatAggregationResource(MusicDataManager musicDataManager, UserValidationManager userValidationManager) {
+        this.musicDataManager = musicDataManager;
+        this.userValidationManager = userValidationManager;
     }
 
     @GET
