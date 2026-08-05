@@ -24,11 +24,11 @@ CREATE TABLE UserRole(
 CREATE TABLE Upload(
     uploadId BIGINT PRIMARY KEY AUTO_INCREMENT,
     uploadName VARCHAR(255),
-    userId INT NOT NULL
+    userId BIGINT NOT NULL
 );
 
 CREATE TABLE UploadItem(
-    uploadItemId INT PRIMARY KEY AUTO_INCREMENT,
+    uploadItemId BIGINT PRIMARY KEY AUTO_INCREMENT,
     uploadId BIGINT NOT NULL,
 
     timestamp DATETIME NOT NULL,
@@ -65,3 +65,23 @@ CREATE VIEW SongView AS
         (albumName IS NOT NULL) AND
         (artistName IS NOT NULL) AND
         (spotifyTrackUri IS NOT NULL);
+
+CREATE TABLE Selection (
+    selectionId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    userId BIGINT,
+    selectionTitle VARCHAR(60),
+    graphType VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE SelectionItem (
+    selectionItemId BIGINT PRIMARY KEY AUTO_INCREMENT,
+    selectionId BIGINT NOT NULL,
+
+    trackName VARCHAR(500),
+    albumName VARCHAR(500),
+    artistName VARCHAR(500),
+
+    itemType VARCHAR(20) NOT NULL,
+    startDate DATETIME NOT NULL,
+    endDate DATETIME NOT NULL
+);

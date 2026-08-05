@@ -1,5 +1,6 @@
 package com.spotisee.app.models.dao;
 
+import com.spotisee.app.models.enums.GraphType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,5 +12,6 @@ public class SelectionResponse {
     private long selectionId;
     private long userId;
     private String selectionTitle;
+    private GraphType graphType;
     private List<SelectionItem> selectionItems;
 }

@@ -10,6 +10,7 @@ import com.spotisee.app.models.dao.SelectionResponse;
 import com.spotisee.app.models.requests.SelectionItemRequest;
 import com.spotisee.app.models.requests.SelectionRequest;
 import com.spotisee.app.models.requests.UpdateSelectionItemRequest;
+import com.spotisee.app.models.requests.UpdateSelectionRequest;
 import io.dropwizard.auth.Auth;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -34,7 +35,11 @@ public class SelectionResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createSelection(@Auth User user, @Valid @NotNull SelectionRequest request) {
-        long selectionId = selectionManager.createSelection(user.getUserId(), request.getSelectionTitle());
+        long selectionId = selectionManager.createSelection(
+                user.getUserId(),
+                request.getSelectionTitle(),
+                request.getGraphType()
+        );
         return Response.ok(selectionId).build();
     }
 
@@ -49,10 +54,10 @@ public class SelectionResource {
     public Response updateSelection(
             @Auth User user,
             @PathParam("selectionId") long selectionId,
-            @Valid @NotNull SelectionRequest request
+            @Valid @NotNull UpdateSelectionRequest request
     ) {
         userValidationManager.validateUserHasSelection(user, selectionId);
-        selectionManager.updateSelection(user.getUserId(), selectionId, request.getSelectionTitle());
+        selectionManager.updateSelection(user.getUserId(), selectionId, request.getSelectionTitle(), request.getGraphType());
         return Response.accepted().build();
     }
 
@@ -78,7 +83,6 @@ public class SelectionResource {
                 request.getAlbumName(),
                 request.getArtistName(),
                 request.getItemType(),
-                request.getGraphType(),
                 request.getStartDate(),
                 request.getEndDate()
         );
@@ -104,7 +108,6 @@ public class SelectionResource {
         userValidationManager.validateUserHasSelectionItem(user, selectionId, selectionItemId);
         selectionManager.updateSelectionItem(
                 selectionItemId,
-                request.getGraphType(),
                 request.getStartDate(),
                 request.getEndDate()
         );
