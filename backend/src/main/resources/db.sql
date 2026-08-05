@@ -4,23 +4,25 @@ DROP TABLE IF EXISTS UserRole;
 DROP TABLE IF EXISTS Upload;
 DROP TABLE IF EXISTS UploadItem;
 DROP VIEW IF EXISTS SongView;
+DROP TABLE IF EXISTS Selection;
+DROP TABLE IF EXISTS SelectionItem;
 
 
 CREATE TABLE Users(
-    userId INT PRIMARY KEY AUTO_INCREMENT,
+    userId BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) NOT NULL,
     passwordHash VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE UserRole(
-    userId INT,
+    userId BIGINT,
     role VARCHAR(255),
     PRIMARY KEY (userId, role)
 
 );
 
 CREATE TABLE Upload(
-    uploadId INT PRIMARY KEY AUTO_INCREMENT,
+    uploadId BIGINT PRIMARY KEY AUTO_INCREMENT,
     uploadName VARCHAR(255),
     userId INT NOT NULL
 );
@@ -63,23 +65,3 @@ CREATE VIEW SongView AS
         (albumName IS NOT NULL) AND
         (artistName IS NOT NULL) AND
         (spotifyTrackUri IS NOT NULL);
-
-CREATE TABLE GraphSelection (
-    graphSelectionId BIGINT PRIMARY KEY AUTO_INCREMENT,
-    userId INT,
-    graphSelectionName VARCHAR(255),
-);
-
-CREATE TABLE SelectedItem (
-    selectedItemId BIGINT PRIMARY KEY AUTO_INCREMENT,
-    graphSelectionId BIGINT NOT NULL,
-
-    trackName VARCHAR(500),
-    albumName VARCHAR(500),
-    artistName VARCHAR(500) NOT NULL,
-
-    startDate DATETIME NOT NULL,
-    endDate DATETIME NOT NULL,
-
-    graphType VARCHAR(20) NOT NULL
-);
