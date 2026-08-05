@@ -31,5 +31,6 @@ public class GraphingResource {
     public Response getGraphData(@Auth User user, @PathParam("selectionId") long selectionId) {
         userValidationManager.validateUserHasSelection(user, selectionId);
         graphingManager.getGraphingData(user.getUserId(), selectionId);
+        return Response.ok().build();
     }
 }

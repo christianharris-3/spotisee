@@ -4,6 +4,7 @@ import com.spotisee.app.models.dao.Selection;
 import com.spotisee.app.models.dao.SelectionItem;
 import com.spotisee.app.models.enums.GraphType;
 import com.spotisee.app.models.enums.ItemType;
+import com.spotisee.app.models.enums.PointFrequency;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
@@ -16,19 +17,22 @@ import java.util.Optional;
 
 public interface SelectionDao {
     @SqlUpdate("""
-            INSERT INTO Selection (userId, selectionTitle, graphType)
-            VALUES (:userId, :selectionTitle, :graphType);
+            INSERT INTO Selection (userId, selectionTitle, graphType, pointFrequency, pointFrequencyDays, daysSummedPerPoint)
+            VALUES (:userId, :selectionTitle, :graphType, :pointFrequency, :pointFrequency, :daysSummedPerPoint);
             """)
     @GetGeneratedKeys
     long createSelection(
             @Bind("userId") long userId,
             @Bind("selectionTitle") String selectionTitle,
-            @Bind("graphType") GraphType graphType
+            @Bind("graphType") GraphType graphType,
+            @Bind("pointFrequency") PointFrequency pointFrequency,
+            @Bind("pointFrequencyDays") Integer pointFrequencyDays,
+            @Bind("daysSummedPerPoint") Integer daysSummedPerPoint
     );
 
     @RegisterBeanMapper(Selection.class)
     @SqlQuery("""
-            SELECT selectionId, userId, selectionTitle, graphType
+            SELECT selectionId, userId, selectionTitle, graphType, pointFrequency, pointFrequencyDays, daysSummedPerPoint
             FROM Selection
             WHERE (:userId = userId);
             """)
@@ -36,7 +40,7 @@ public interface SelectionDao {
 
     @RegisterBeanMapper(Selection.class)
     @SqlQuery("""
-            SELECT selectionId, userId, selectionTitle, graphType
+            SELECT selectionId, userId, selectionTitle, graphType, pointFrequency, pointFrequencyDays, daysSummedPerPoint
             FROM Selection
             WHERE (:userId = userId) AND (:selectionId = selectionId);
             """)
@@ -46,13 +50,19 @@ public interface SelectionDao {
             UPDATE Selection
             SET selectionTitle = COALESCE(:selectionTitle, selectionTitle),
                 graphType = COALESCE(:graphType, graphType)
+                pointFrequency = COALESCE(:pointFrequency, pointFrequency)
+                pointFrequencyDays = COALESCE(:pointFrequencyDays, pointFrequencyDays)
+                daysSummedPerPoint = COALESCE(:daysSummedPerPoint, daysSummedPerPoint)
             WHERE (:userId = userId) AND (:selectionId = selectionId);
             """)
     void updateSelection(
             @Bind("userId") long userId,
             @Bind("selectionId") long selectionId,
             @Bind("selectionTitle") String selectionTitle,
-            @Bind("graphType") GraphType graphType
+            @Bind("graphType") GraphType graphType,
+            @Bind("pointFrequency") PointFrequency pointFrequency,
+            @Bind("pointFrequencyDays") Integer pointFrequencyDays,
+            @Bind("daysSummedPerPoint") Integer daysSummedPerPoint
     );
 
     @SqlUpdate("""
