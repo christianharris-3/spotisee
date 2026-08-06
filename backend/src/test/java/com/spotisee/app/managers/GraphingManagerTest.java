@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -37,26 +38,66 @@ public class GraphingManagerTest {
     GraphingManager graphingManager;
 
     @Test
-    void test_testing() {
+    void graphingManagerYearlyTest() {
 
         when(graphingDao.getSongPoints(any(),
                 any(),
                 anyString(),
                 anyString(),
                 anyString())).thenReturn(List.of(new SingleSong(getStart().plusDays(10), 0, 1, "", "", "")));
-        when(selectionManager.getSelectionItems(1, 1)).thenReturn(getSelection());
+        when(selectionManager.getSelectionItems(1, 1)).thenReturn(getSelection(PointFrequency.YEARLY));
 
         GraphData graphData = graphingManager.getGraphingData(1, 1);
 
-
+        assertEquals(1, graphData.getGraphLineData().size());
+        assertEquals(1, graphData.getGraphLineData().get(0).getPointData().size());
+        assertEquals(1, graphData.getGraphLineData().get(0).getPointData().get(0).getValue());
     }
 
-    private SelectionResponse getSelection() {
+    @Test
+    void graphingManagerMonthlyTest() {
+        when(graphingDao.getSongPoints(any(), any(), anyString(), anyString(), anyString()))
+                .thenReturn(List.of(
+                        new SingleSong(getStart().plusDays(15), 0, 1, "", "", ""),
+                        new SingleSong(getStart().plusDays(45), 0, 2, "", "", ""),
+                        new SingleSong(getStart().plusDays(75), 0, 3, "", "", "")
+                ));
+        when(selectionManager.getSelectionItems(1, 1)).thenReturn(getSelection(PointFrequency.MONTHLY));
+
+        GraphData graphData = graphingManager.getGraphingData(1, 1);
+
+        assertEquals(1, graphData.getGraphLineData().size());
+        assertEquals(3, graphData.getGraphLineData().get(0).getPointData().size());
+        assertEquals(1, graphData.getGraphLineData().get(0).getPointData().get(0).getValue());
+        assertEquals(2, graphData.getGraphLineData().get(0).getPointData().get(1).getValue());
+        assertEquals(3, graphData.getGraphLineData().get(0).getPointData().get(2).getValue());
+    }
+
+    @Test
+    void graphingManagerWeekly() {
+        when(graphingDao.getSongPoints(any(), any(), anyString(), anyString(), anyString()))
+                .thenReturn(List.of(
+                        new SingleSong(getStart().plusDays(3), 0, 1, "", "", ""),
+                        new SingleSong(getStart().plusDays(10), 0, 2, "", "", ""),
+                        new SingleSong(getStart().plusDays(50), 0, 3, "", "", "")
+                ));
+        when(selectionManager.getSelectionItems(1, 1)).thenReturn(getSelection(PointFrequency.WEEKLY));
+
+        GraphData graphData = graphingManager.getGraphingData(1, 1);
+
+        assertEquals(1, graphData.getGraphLineData().size());
+        assertEquals(106, graphData.getGraphLineData().get(0).getPointData().size());
+        assertEquals(1, graphData.getGraphLineData().get(0).getPointData().get(1).getValue());
+        assertEquals(2, graphData.getGraphLineData().get(0).getPointData().get(2).getValue());
+        assertEquals(3, graphData.getGraphLineData().get(0).getPointData().get(8).getValue());
+    }
+
+    private SelectionResponse getSelection(PointFrequency pointFrequency) {
         return new SelectionResponse(1,
                 1,
                 "title",
                 GraphType.LISTENS,
-                PointFrequency.YEARLY,
+                pointFrequency,
                 null,
                 null,
                 List.of(new SelectionItem(1,

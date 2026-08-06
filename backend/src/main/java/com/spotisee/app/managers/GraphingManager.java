@@ -13,10 +13,7 @@ import com.spotisee.app.models.response.GraphLineData;
 import com.spotisee.app.models.response.GraphLinePointData;
 
 import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
@@ -69,11 +66,11 @@ public class GraphingManager {
             List<GraphLinePointData> outputPoints = new ArrayList<>();
 
             for (Instant dataPointTimestamp : dataPointTimestamps) {
-                while (lowerPointer < songs.size() && dataPointTimestamp.minus(windowSize).isBefore(Instant.from(songs.get(lowerPointer).getEndTime()))) {
+                while (lowerPointer < songs.size() && dataPointTimestamp.minus(windowSize).isAfter(songs.get(lowerPointer).getEndTime().toInstant(ZoneOffset.UTC))) {
                     windowValue -= songValues.get(lowerPointer);
                     lowerPointer += 1;
                 }
-                while (upperPointer < songs.size() && dataPointTimestamp.isBefore(Instant.from(songs.get(upperPointer).getEndTime()))) {
+                while (upperPointer < songs.size() && dataPointTimestamp.isAfter(songs.get(upperPointer).getEndTime().toInstant(ZoneOffset.UTC))) {
                     windowValue += songValues.get(upperPointer);
                     upperPointer += 1;
                 }
@@ -106,16 +103,16 @@ public class GraphingManager {
 
             while (songPointer < songs.size()) {
                 int cummulative_value = 0;
-                while (songs.get(songPointer).getEndTime().getMonthValue() == currentMonth) {
-                    songPointer += 1;
+                while (songPointer < songs.size() && songs.get(songPointer).getEndTime().getMonthValue() == currentMonth) {
                     cummulative_value += songValues.get(songPointer);
+                    songPointer += 1;
                 }
-                LocalDateTime lastDate = songs.get(songPointer).getEndTime();
-                Instant end_of_month = Instant.from(LocalDate.of(
+                LocalDateTime lastDate = songs.get(songPointer-1).getEndTime();
+                Instant end_of_month = LocalDate.of(
                         lastDate.getYear(),
                         lastDate.getMonth(),
                         lastDate.getMonth().length(lastDate.toLocalDate().isLeapYear())
-                ).atTime(23, 59, 59));
+                ).atTime(23, 59, 59).toInstant(ZoneOffset.UTC);
                 currentMonth = (currentMonth % 12) + 1;
                 outputPoints.add(
                         new GraphLinePointData(
@@ -144,14 +141,14 @@ public class GraphingManager {
 
             while (songPointer < songs.size()) {
                 int cummulative_value = 0;
-                while (songs.get(songPointer).getEndTime().getYear() == currentYear) {
-                    songPointer += 1;
+                while (songPointer < songs.size() && songs.get(songPointer).getEndTime().getYear() == currentYear) {
                     cummulative_value += songValues.get(songPointer);
+                    songPointer += 1;
                 }
-                LocalDateTime lastDate = songs.get(songPointer).getEndTime();
-                Instant end_of_month = Instant.from(LocalDate.of(
+                LocalDateTime lastDate = songs.get(songPointer-1).getEndTime();
+                Instant end_of_month = LocalDate.of(
                         lastDate.getYear(), 12, 31
-                ).atTime(23, 59, 59));
+                ).atTime(23, 59, 59).toInstant(ZoneOffset.UTC);
                 currentYear = currentYear + 1;
                 outputPoints.add(
                         new GraphLinePointData(
@@ -246,7 +243,7 @@ public class GraphingManager {
 
         while (startDate.isBefore(endDate)) {
             startDate = startDate.plus(interval);
-            dataPointTimestamps.add(Instant.from(startDate));
+            dataPointTimestamps.add(startDate.toInstant(ZoneOffset.UTC));
         }
 
 

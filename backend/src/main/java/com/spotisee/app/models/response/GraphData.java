@@ -14,7 +14,7 @@ public class GraphData {
     private GraphType graphType;
 
     private PointFrequency pointFrequency;
-    private int pointFrequencyDays;
-    private int daysSummedPerPoint;
+    private Integer pointFrequencyDays;
+    private Integer daysSummedPerPoint;
     private List<GraphLineData> graphLineData;
 }
