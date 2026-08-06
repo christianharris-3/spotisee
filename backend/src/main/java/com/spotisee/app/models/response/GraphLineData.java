@@ -1,5 +1,6 @@
 package com.spotisee.app.models.response;
 
+import com.spotisee.app.models.enums.ItemType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class GraphLineData {
     private String albumName;
     private String artistName;
 
-    private String itemType;
+    private ItemType itemType;
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;

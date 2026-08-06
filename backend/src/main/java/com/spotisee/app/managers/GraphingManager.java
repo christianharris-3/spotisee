@@ -3,7 +3,10 @@ package com.spotisee.app.managers;
 import com.spotisee.app.dao.GraphingDao;
 import com.spotisee.app.models.dao.SelectionItem;
 import com.spotisee.app.models.dao.SelectionResponse;
-import com.spotisee.app.models.dao.SingleSong;
+import com.spotisee.app.models.dao.graph.BaseSingleDataPoint;
+import com.spotisee.app.models.dao.graph.SingleDataPoint;
+import com.spotisee.app.models.dao.graph.SingleSong;
+import com.spotisee.app.models.enums.ItemType;
 import com.spotisee.app.models.enums.PointFrequency;
 import com.spotisee.app.models.response.GraphData;
 import com.spotisee.app.models.response.GraphLineData;
@@ -18,6 +21,8 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.spotisee.app.models.enums.ItemType.SONG;
 
 public class GraphingManager {
 
@@ -44,15 +49,15 @@ public class GraphingManager {
     private GraphData getGraphDataCustomFrequency(SelectionResponse selection) {
 
         TemporalAmount windowSize = switch (selection.getPointFrequency()) {
-            case DAILY ->  Duration.of(1, ChronoUnit.DAYS);
-            case WEEKLY ->  Duration.of(7, ChronoUnit.DAYS);
-            default ->  Duration.of(selection.getDaysSummedPerPoint(), ChronoUnit.DAYS);
+            case DAILY -> Duration.of(1, ChronoUnit.DAYS);
+            case WEEKLY -> Duration.of(7, ChronoUnit.DAYS);
+            default -> Duration.of(selection.getDaysSummedPerPoint(), ChronoUnit.DAYS);
         };
 
         List<GraphLineData> graphLines = new ArrayList<>();
 
         for (SelectionItem selectionItem : selection.getSelectionItems()) {
-            List<SingleSong> songs = getSongs(selectionItem);
+            List<SingleDataPoint> songs = getSongs(selectionItem);
 
             List<Instant> dataPointTimestamps = getDataPointTimestamps(selection, selectionItem);
 
@@ -90,7 +95,7 @@ public class GraphingManager {
         List<GraphLineData> graphLines = new ArrayList<>();
 
         for (SelectionItem selectionItem : selection.getSelectionItems()) {
-            List<SingleSong> songs = getSongs(selectionItem);
+            List<SingleDataPoint> songs = getSongs(selectionItem);
 
             List<Integer> songValues = getSongValues(selection, songs);
 
@@ -128,7 +133,7 @@ public class GraphingManager {
         List<GraphLineData> graphLines = new ArrayList<>();
 
         for (SelectionItem selectionItem : selection.getSelectionItems()) {
-            List<SingleSong> songs = getSongs(selectionItem);
+            List<SingleDataPoint> songs = getSongs(selectionItem);
 
             List<Integer> songValues = getSongValues(selection, songs);
 
@@ -146,7 +151,7 @@ public class GraphingManager {
                 LocalDateTime lastDate = songs.get(songPointer).getEndTime();
                 Instant end_of_month = Instant.from(LocalDate.of(
                         lastDate.getYear(), 12, 31
-                        ).atTime(23, 59, 59));
+                ).atTime(23, 59, 59));
                 currentYear = currentYear + 1;
                 outputPoints.add(
                         new GraphLinePointData(
@@ -160,19 +165,37 @@ public class GraphingManager {
         return createGraphData(selection, graphLines);
     }
 
-    private List<SingleSong> getSongs(SelectionItem selectionItem) {
-        return graphingDao.getSongPoints(
-                Timestamp.valueOf(selectionItem.getStartDate()),
-                Timestamp.valueOf(selectionItem.getEndDate()),
-                selectionItem.getTrackName(),
-                selectionItem.getArtistName()
-        );
+    private List<SingleDataPoint> getSongs(SelectionItem selectionItem) {
+        return switch (selectionItem.getItemType()) {
+            case SONG -> graphingDao.getSongPoints(
+                    Timestamp.valueOf(selectionItem.getStartDate()),
+                    Timestamp.valueOf(selectionItem.getEndDate()),
+                    selectionItem.getTrackName(),
+                    selectionItem.getAlbumName(),
+                    selectionItem.getArtistName()
+            );
+            case ALBUM -> graphingDao.getAlbumPoints(
+                    Timestamp.valueOf(selectionItem.getStartDate()),
+                    Timestamp.valueOf(selectionItem.getEndDate()),
+                    selectionItem.getAlbumName(),
+                    selectionItem.getArtistName()
+            );
+            case ARTIST -> graphingDao.getArtistPoints(
+                    Timestamp.valueOf(selectionItem.getStartDate()),
+                    Timestamp.valueOf(selectionItem.getEndDate()),
+                    selectionItem.getArtistName()
+            );
+            case COMBINED -> graphingDao.getCombinedPoints(
+                    Timestamp.valueOf(selectionItem.getStartDate()),
+                    Timestamp.valueOf(selectionItem.getEndDate())
+            );
+        };
     }
 
-    private static List<Integer> getSongValues(SelectionResponse selection, List<SingleSong> songs) {
+    private static List<Integer> getSongValues(SelectionResponse selection, List<SingleDataPoint> songs) {
         return switch (selection.getGraphType()) {
-            case TIME -> songs.stream().map(SingleSong::getMsPlayed).toList();
-            case LISTENS -> songs.stream().map(SingleSong::getListened).toList();
+            case TIME -> songs.stream().map(SingleDataPoint::getMsPlayed).toList();
+            case LISTENS -> songs.stream().map(SingleDataPoint::getListened).toList();
             default -> songs.stream().map(song -> 1).toList();
         };
     }
@@ -213,7 +236,7 @@ public class GraphingManager {
                 break;
             case WEEKLY:
                 interval = Duration.of(7, ChronoUnit.DAYS);
-                startDate = startDate.minusDays(startDate.getDayOfWeek().getValue()-1);
+                startDate = startDate.minusDays(startDate.getDayOfWeek().getValue() - 1);
                 break;
             default:
                 interval = Duration.of(selection.getPointFrequencyDays(), ChronoUnit.DAYS);
