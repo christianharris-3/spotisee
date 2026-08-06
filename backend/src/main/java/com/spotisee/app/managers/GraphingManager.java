@@ -4,7 +4,6 @@ import com.spotisee.app.dao.GraphingDao;
 import com.spotisee.app.models.dao.SelectionItem;
 import com.spotisee.app.models.dao.SelectionResponse;
 import com.spotisee.app.models.dao.SingleSong;
-import com.spotisee.app.models.enums.GraphType;
 import com.spotisee.app.models.enums.PointFrequency;
 import com.spotisee.app.models.response.GraphData;
 import com.spotisee.app.models.response.GraphLineData;
@@ -33,32 +32,31 @@ public class GraphingManager {
     public GraphData getGraphingData(long userId, long selectionId) {
         SelectionResponse selection = selectionManager.getSelectionItems(userId, selectionId);
 
-        if (selection.getPointFrequency() == PointFrequency.CUSTOM) {
-            return getGraphDataCustomFrequency(selection);
+        if (selection.getPointFrequency() == PointFrequency.MONTHLY) {
+            return getGraphingDataMonthly(selection);
+        } else if (selection.getPointFrequency() == PointFrequency.YEARLY) {
+            return getGraphingDataYearly(selection);
         }
+        return getGraphDataCustomFrequency(selection);
+
     }
 
     private GraphData getGraphDataCustomFrequency(SelectionResponse selection) {
 
-        TemporalAmount windowSize = Duration.of(selection.getDaysSummedPerPoint(), ChronoUnit.DAYS);
+        TemporalAmount windowSize = switch (selection.getPointFrequency()) {
+            case DAILY ->  Duration.of(1, ChronoUnit.DAYS);
+            case WEEKLY ->  Duration.of(7, ChronoUnit.DAYS);
+            default ->  Duration.of(selection.getDaysSummedPerPoint(), ChronoUnit.DAYS);
+        };
 
         List<GraphLineData> graphLines = new ArrayList<>();
 
         for (SelectionItem selectionItem : selection.getSelectionItems()) {
-            List<SingleSong> songs = graphingDao.getSongPoints(
-                    Timestamp.valueOf(selectionItem.getStartDate()),
-                    Timestamp.valueOf(selectionItem.getEndDate()),
-                    selectionItem.getTrackName(),
-                    selectionItem.getArtistName()
-            );
+            List<SingleSong> songs = getSongs(selectionItem);
 
             List<Instant> dataPointTimestamps = getDataPointTimestamps(selection, selectionItem);
 
-            List<Integer> songValues = switch (selection.getGraphType()) {
-                case TIME -> songs.stream().map(SingleSong::getMsPlayed).toList();
-                case LISTENS -> songs.stream().map(SingleSong::getListened).toList();
-                case COUNT -> songs.stream().map(song -> 1).toList();
-            };
+            List<Integer> songValues = getSongValues(selection, songs);
 
             int lowerPointer = 0;
             int upperPointer = 0;
@@ -82,17 +80,116 @@ public class GraphingManager {
                 );
             }
 
-            graphLines.add(new GraphLineData(
-                    selectionItem.getTrackName(),
-                    selectionItem.getAlbumName(),
-                    selectionItem.getArtistName(),
-                    selectionItem.getItemType(),
-                    selectionItem.getStartDate(),
-                    selectionItem.getEndDate(),
-                    outputPoints
-            ));
+            graphLines.add(getGraphLineData(selectionItem, outputPoints));
         }
 
+        return createGraphData(selection, graphLines);
+    }
+
+    private GraphData getGraphingDataMonthly(SelectionResponse selection) {
+        List<GraphLineData> graphLines = new ArrayList<>();
+
+        for (SelectionItem selectionItem : selection.getSelectionItems()) {
+            List<SingleSong> songs = getSongs(selectionItem);
+
+            List<Integer> songValues = getSongValues(selection, songs);
+
+            List<GraphLinePointData> outputPoints = new ArrayList<>();
+
+            int songPointer = 0;
+            int currentMonth = songs.get(0).getEndTime().getMonthValue();
+
+            while (songPointer < songs.size()) {
+                int cummulative_value = 0;
+                while (songs.get(songPointer).getEndTime().getMonthValue() == currentMonth) {
+                    songPointer += 1;
+                    cummulative_value += songValues.get(songPointer);
+                }
+                LocalDateTime lastDate = songs.get(songPointer).getEndTime();
+                Instant end_of_month = Instant.from(LocalDate.of(
+                        lastDate.getYear(),
+                        lastDate.getMonth(),
+                        lastDate.getMonth().length(lastDate.toLocalDate().isLeapYear())
+                ).atTime(23, 59, 59));
+                currentMonth = (currentMonth % 12) + 1;
+                outputPoints.add(
+                        new GraphLinePointData(
+                                end_of_month,
+                                cummulative_value
+                        )
+                );
+            }
+            graphLines.add(getGraphLineData(selectionItem, outputPoints));
+        }
+        return createGraphData(selection, graphLines);
+    }
+
+    private GraphData getGraphingDataYearly(SelectionResponse selection) {
+        List<GraphLineData> graphLines = new ArrayList<>();
+
+        for (SelectionItem selectionItem : selection.getSelectionItems()) {
+            List<SingleSong> songs = getSongs(selectionItem);
+
+            List<Integer> songValues = getSongValues(selection, songs);
+
+            List<GraphLinePointData> outputPoints = new ArrayList<>();
+
+            int songPointer = 0;
+            int currentYear = songs.get(0).getEndTime().getYear();
+
+            while (songPointer < songs.size()) {
+                int cummulative_value = 0;
+                while (songs.get(songPointer).getEndTime().getYear() == currentYear) {
+                    songPointer += 1;
+                    cummulative_value += songValues.get(songPointer);
+                }
+                LocalDateTime lastDate = songs.get(songPointer).getEndTime();
+                Instant end_of_month = Instant.from(LocalDate.of(
+                        lastDate.getYear(), 12, 31
+                        ).atTime(23, 59, 59));
+                currentYear = currentYear + 1;
+                outputPoints.add(
+                        new GraphLinePointData(
+                                end_of_month,
+                                cummulative_value
+                        )
+                );
+            }
+            graphLines.add(getGraphLineData(selectionItem, outputPoints));
+        }
+        return createGraphData(selection, graphLines);
+    }
+
+    private List<SingleSong> getSongs(SelectionItem selectionItem) {
+        return graphingDao.getSongPoints(
+                Timestamp.valueOf(selectionItem.getStartDate()),
+                Timestamp.valueOf(selectionItem.getEndDate()),
+                selectionItem.getTrackName(),
+                selectionItem.getArtistName()
+        );
+    }
+
+    private static List<Integer> getSongValues(SelectionResponse selection, List<SingleSong> songs) {
+        return switch (selection.getGraphType()) {
+            case TIME -> songs.stream().map(SingleSong::getMsPlayed).toList();
+            case LISTENS -> songs.stream().map(SingleSong::getListened).toList();
+            default -> songs.stream().map(song -> 1).toList();
+        };
+    }
+
+    private static GraphLineData getGraphLineData(SelectionItem selectionItem, List<GraphLinePointData> outputPoints) {
+        return new GraphLineData(
+                selectionItem.getTrackName(),
+                selectionItem.getAlbumName(),
+                selectionItem.getArtistName(),
+                selectionItem.getItemType(),
+                selectionItem.getStartDate(),
+                selectionItem.getEndDate(),
+                outputPoints
+        );
+    }
+
+    private static GraphData createGraphData(SelectionResponse selection, List<GraphLineData> graphLines) {
         return new GraphData(
                 "title",
                 selection.getGraphType(),
@@ -103,10 +200,6 @@ public class GraphingManager {
         );
     }
 
-    private GraphData getGraphingDataSpecificFrequency() {
-
-    }
-
     private List<Instant> getDataPointTimestamps(SelectionResponse selection, SelectionItem selectionItem) {
         LocalDateTime startDate = selectionItem.getStartDate();
         LocalDateTime endDate = selectionItem.getEndDate().toLocalDate().atStartOfDay().plusDays(1L);
@@ -115,9 +208,6 @@ public class GraphingManager {
         Duration interval;
 
         switch (selection.getPointFrequency()) {
-            case CUSTOM:
-                interval = Duration.of(selection.getPointFrequencyDays(), ChronoUnit.DAYS);
-                break;
             case DAILY:
                 interval = Duration.of(1, ChronoUnit.DAYS);
                 break;
@@ -125,30 +215,9 @@ public class GraphingManager {
                 interval = Duration.of(7, ChronoUnit.DAYS);
                 startDate = startDate.minusDays(startDate.getDayOfWeek().getValue()-1);
                 break;
-            case MONTHLY:
-                LocalDate prevDate = LocalDate.of(startDate.getYear(), startDate.getMonthValue(), 1);
-                dataPointTimestamps.add(
-                        Instant.from(prevDate)
-                );
-                while (dataPointTimestamps.getLast().isBefore(Instant.from(endDate))) {
-                    if (prevDate.getMonthValue() == 12) {
-                        prevDate = LocalDate.of(prevDate.getYear()+1, 1, 1);
-                    } else {
-                        prevDate = LocalDate.of(prevDate.getYear(), prevDate.getMonthValue()+1, 1);
-                    }
-                    dataPointTimestamps.add(Instant.from(prevDate));
-                }
-                return dataPointTimestamps;
-            case YEARLY:
-                LocalDate prevDate = LocalDate.of(startDate.getYear(), 1, 1);
-                dataPointTimestamps.add(
-                        Instant.from(prevDate)
-                );
-                while (dataPointTimestamps.getLast().isBefore(Instant.from(endDate))) {
-                    prevDate = LocalDate.of(prevDate.getYear()+1, 1, 1);
-                    dataPointTimestamps.add(Instant.from(prevDate));
-                }
-                return dataPointTimestamps;
+            default:
+                interval = Duration.of(selection.getPointFrequencyDays(), ChronoUnit.DAYS);
+                break;
         }
 
 
