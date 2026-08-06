@@ -6,6 +6,7 @@ import com.spotisee.app.dao.SelectionDao;
 import com.spotisee.app.managers.GraphingManager;
 import com.spotisee.app.managers.UserValidationManager;
 import com.spotisee.app.models.User;
+import com.spotisee.app.models.response.GraphData;
 import io.dropwizard.auth.Auth;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -30,7 +31,7 @@ public class GraphingResource {
     @Path("{selectionId}")
     public Response getGraphData(@Auth User user, @PathParam("selectionId") long selectionId) {
         userValidationManager.validateUserHasSelection(user, selectionId);
-        graphingManager.getGraphingData(user.getUserId(), selectionId);
+        GraphData graphData = graphingManager.getGraphingData(user.getUserId(), selectionId);
         return Response.ok().build();
     }
 }
