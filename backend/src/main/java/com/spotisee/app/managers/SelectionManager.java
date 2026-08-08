@@ -6,6 +6,7 @@ import com.spotisee.app.models.dao.SelectionItem;
 import com.spotisee.app.models.dao.SelectionResponse;
 import com.spotisee.app.models.enums.GraphType;
 import com.spotisee.app.models.enums.ItemType;
+import com.spotisee.app.models.enums.PointFrequency;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -20,16 +21,46 @@ public class SelectionManager {
         this.selectionDao = selectionDao;
     }
 
-    public long createSelection(long userId, String selectionTitle, GraphType graphType) {
-        return selectionDao.createSelection(userId, selectionTitle, graphType);
+    public long createSelection(
+            long userId,
+            String selectionTitle,
+            GraphType graphType,
+            PointFrequency pointFrequency,
+            Integer pointFrequencyDays,
+            Integer daysSummedPerPoint
+    ) {
+        return selectionDao.createSelection(
+                userId,
+                selectionTitle,
+                graphType,
+                pointFrequency,
+                pointFrequencyDays,
+                daysSummedPerPoint
+        );
     }
 
     public List<Selection> getSelections(long userId) {
         return selectionDao.getUserSelections(userId);
     }
 
-    public void updateSelection(long userId, long selectionId, String selectionTitle, GraphType graphType) {
-        selectionDao.updateSelection(userId, selectionId, selectionTitle, graphType);
+    public void updateSelection(
+            long userId,
+            long selectionId,
+            String selectionTitle,
+            GraphType graphType,
+            PointFrequency pointFrequency,
+            Integer pointFrequencyDays,
+            Integer daysSummedPerPoint
+    ) {
+        selectionDao.updateSelection(
+                userId,
+                selectionId,
+                selectionTitle,
+                graphType,
+                pointFrequency,
+                pointFrequencyDays,
+                daysSummedPerPoint
+        );
     }
 
     public void deleteSelection(long userId, long selectionId) {
@@ -67,16 +98,15 @@ public class SelectionManager {
                 userId,
                 selection.get().getSelectionTitle(),
                 selection.get().getGraphType(),
+                selection.get().getPointFrequency(),
+                selection.get().getPointFrequencyDays(),
+                selection.get().getDaysSummedPerPoint(),
                 selectionDao.getSelectionItems(userId, selectionId)
         );
     }
 
     public void updateSelectionItem(long selectionItemId, Instant startDate, Instant endDate) {
-        selectionDao.updateSelectionItem(
-                selectionItemId,
-                toTimestamp(startDate),
-                toTimestamp(endDate)
-        );
+        selectionDao.updateSelectionItem(selectionItemId, toTimestamp(startDate), toTimestamp(endDate));
     }
 
     public void deleteSelectionItem(long selectionItemId) {

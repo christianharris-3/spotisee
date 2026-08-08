@@ -25,8 +25,8 @@ public class UploadDataResource {
     private final UploadDataManager uploadDataManager;
 
 
-    public UploadDataResource(UploadDao uploadDao) {
-        this.uploadDataManager = new UploadDataManager(uploadDao);
+    public UploadDataResource(UploadDataManager uploadDataManager) {
+        this.uploadDataManager = uploadDataManager;
     }
 
     @GET

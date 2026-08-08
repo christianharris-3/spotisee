@@ -70,7 +70,10 @@ CREATE TABLE Selection (
     selectionId BIGINT PRIMARY KEY AUTO_INCREMENT,
     userId BIGINT,
     selectionTitle VARCHAR(60),
-    graphType VARCHAR(20) NOT NULL
+    graphType VARCHAR(20) NOT NULL,
+    pointFrequency VARCHAR(20) NOT NULL,
+    pointFrequencyDays INT,
+    daysSummedPerPoint INT
 );
 
 CREATE TABLE SelectionItem (

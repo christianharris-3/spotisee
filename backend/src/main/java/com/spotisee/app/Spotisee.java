@@ -3,16 +3,11 @@ package com.spotisee.app;
 import com.spotisee.app.config.AppConfiguration;
 import com.spotisee.app.config.MySqlLogger;
 import com.spotisee.app.config.SpotiseeAuthenticator;
-import com.spotisee.app.dao.AuthDao;
-import com.spotisee.app.dao.SelectionDao;
-import com.spotisee.app.dao.SongDataDao;
-import com.spotisee.app.dao.UploadDao;
+import com.spotisee.app.dao.*;
 import com.spotisee.app.exceptions.mapper.UnauthorisedExceptionMapper;
+import com.spotisee.app.managers.*;
 import com.spotisee.app.models.User;
-import com.spotisee.app.resources.GraphSelectionResource;
-import com.spotisee.app.resources.LoginResource;
-import com.spotisee.app.resources.StatAggregationResource;
-import com.spotisee.app.resources.UploadDataResource;
+import com.spotisee.app.resources.*;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
@@ -45,6 +40,14 @@ public class Spotisee extends Application<AppConfiguration> {
         SongDataDao songDataDao = jdbi.onDemand(SongDataDao.class);
         AuthDao authDao = jdbi.onDemand(AuthDao.class);
         SelectionDao selectionDao = jdbi.onDemand(SelectionDao.class);
+        GraphingDao graphingDao = jdbi.onDemand(GraphingDao.class);
+
+        // Managers
+        UploadDataManager uploadDataManager = new UploadDataManager(uploadDao);
+        MusicDataManager musicDataManager = new MusicDataManager(songDataDao);
+        UserValidationManager userValidationManager = new UserValidationManager(authDao);
+        SelectionManager selectionManager = new SelectionManager(selectionDao);
+        GraphingManager graphingManager = new GraphingManager(graphingDao, selectionManager);
 
         // Auth
         SpotiseeAuthenticator authenticator = new SpotiseeAuthenticator(authDao);
@@ -63,8 +66,9 @@ public class Spotisee extends Application<AppConfiguration> {
 
         // API endpoints
         environment.jersey().register(new LoginResource(authenticator));
-        environment.jersey().register(new StatAggregationResource(songDataDao, authDao));
-        environment.jersey().register(new UploadDataResource(uploadDao));
-        environment.jersey().register(new GraphSelectionResource(selectionDao, authDao));
+        environment.jersey().register(new StatAggregationResource(musicDataManager, userValidationManager));
+        environment.jersey().register(new UploadDataResource(uploadDataManager));
+        environment.jersey().register(new SelectionResource(selectionManager, userValidationManager));
+        environment.jersey().register(new GraphingResource(graphingManager, userValidationManager));
     }
 }

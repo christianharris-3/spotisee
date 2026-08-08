@@ -1,17 +1,15 @@
-package com.spotisee.app.models.dao;
+package com.spotisee.app.models.response;
 
 import com.spotisee.app.models.enums.ItemType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class SelectionItem {
-    private long selectionItemId;
-    private long selectionId;
-
+public class GraphLineData {
     private String trackName;
     private String albumName;
     private String artistName;
@@ -20,4 +18,6 @@ public class SelectionItem {
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+
+    private List<GraphLinePointData> pointData;
 }

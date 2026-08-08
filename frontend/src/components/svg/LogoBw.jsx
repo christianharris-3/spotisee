@@ -1,12 +1,20 @@
+import {useNavigate} from "react-router-dom";
 
 export default function LogoBw(info) {
+    const navigate = useNavigate();
     let width = info.size ? info.size: info.width;
     let height = info.size? info.size: info.height;
 
     let offset = (width-height)/2;
 
+    function pressLogo() {
+        if (info.homeOnClick) {
+            navigate("/");
+        }
+    }
+
     return (
-        <div style={{
+        <div onClick={pressLogo} style={{
             width: width,
             height: height,
             position: "relative"

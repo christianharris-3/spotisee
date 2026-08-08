@@ -1,7 +1,15 @@
 package com.spotisee.app.models.enums;
 
 public enum GraphType {
+    TIME,
     LISTENS,
     COUNT,
-    TIME
+
+    MEAN_TIME,
+    MEAN_LISTENS,
+    MEAN_COUNT,
+
+    PERCENTAGE_TIME,
+    PERCENTAGE_LISTENS,
+    PERCENTAGE_COUNT
 }

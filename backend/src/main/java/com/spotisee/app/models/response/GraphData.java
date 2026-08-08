@@ -1,17 +1,20 @@
-package com.spotisee.app.models.dao;
+package com.spotisee.app.models.response;
 
 import com.spotisee.app.models.enums.GraphType;
 import com.spotisee.app.models.enums.PointFrequency;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class Selection {
-    private long selectionId;
-    private long userId;
-    private String selectionTitle;
+@AllArgsConstructor
+public class GraphData {
+    private String graphTitle;
     private GraphType graphType;
 
     private PointFrequency pointFrequency;
     private Integer pointFrequencyDays;
     private Integer daysSummedPerPoint;
+    private List<GraphLineData> graphLineData;
 }

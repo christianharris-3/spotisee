@@ -11,6 +11,7 @@ import com.spotisee.app.models.requests.SelectionItemRequest;
 import com.spotisee.app.models.requests.SelectionRequest;
 import com.spotisee.app.models.requests.UpdateSelectionItemRequest;
 import com.spotisee.app.models.requests.UpdateSelectionRequest;
+import com.spotisee.app.util.SelectionCorrector;
 import io.dropwizard.auth.Auth;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,23 +23,27 @@ import java.util.List;
 
 @Path("api/selection/")
 @Produces(MediaType.APPLICATION_JSON)
-public class GraphSelectionResource {
+public class SelectionResource {
 
     private final SelectionManager selectionManager;
     private final UserValidationManager userValidationManager;
 
-    public GraphSelectionResource(SelectionDao selectionDao, AuthDao authDao) {
-        this.selectionManager = new SelectionManager(selectionDao);
-        this.userValidationManager = new UserValidationManager(authDao);
+    public SelectionResource(SelectionManager selectionManager, UserValidationManager userValidationManager) {
+        this.selectionManager = selectionManager;
+        this.userValidationManager = userValidationManager;
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createSelection(@Auth User user, @Valid @NotNull SelectionRequest request) {
+        SelectionCorrector.correctSelectionRequest(request);
         long selectionId = selectionManager.createSelection(
                 user.getUserId(),
                 request.getSelectionTitle(),
-                request.getGraphType()
+                request.getGraphType(),
+                request.getPointFrequency(),
+                request.getPointFrequencyDays(),
+                request.getDaysSummedPerPoint()
         );
         return Response.ok(selectionId).build();
     }
@@ -57,7 +62,18 @@ public class GraphSelectionResource {
             @Valid @NotNull UpdateSelectionRequest request
     ) {
         userValidationManager.validateUserHasSelection(user, selectionId);
-        selectionManager.updateSelection(user.getUserId(), selectionId, request.getSelectionTitle(), request.getGraphType());
+        if (!SelectionCorrector.correctUpdateSelectionRequest(request)) {
+            return Response.status(400, "invalid request").build();
+        }
+        selectionManager.updateSelection(
+                user.getUserId(),
+                selectionId,
+                request.getSelectionTitle(),
+                request.getGraphType(),
+                request.getPointFrequency(),
+                request.getPointFrequencyDays(),
+                request.getDaysSummedPerPoint()
+        );
         return Response.accepted().build();
     }
 
@@ -106,11 +122,7 @@ public class GraphSelectionResource {
             @NotNull @Valid UpdateSelectionItemRequest request
     ) {
         userValidationManager.validateUserHasSelectionItem(user, selectionId, selectionItemId);
-        selectionManager.updateSelectionItem(
-                selectionItemId,
-                request.getStartDate(),
-                request.getEndDate()
-        );
+        selectionManager.updateSelectionItem(selectionItemId, request.getStartDate(), request.getEndDate());
         return Response.accepted().build();
     }
 
