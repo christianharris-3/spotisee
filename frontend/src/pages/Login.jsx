@@ -22,7 +22,7 @@ export default function Login() {
                 r.json().then(json => {
                     if (json["token"] !== undefined) {
                         setLoginError(false);
-                        localStorage.setItem("loggedIn", "false");
+                        localStorage.setItem("loggedIn", "true");
                         localStorage.setItem("authToken", json["token"])
                         navigate("/");
                     }

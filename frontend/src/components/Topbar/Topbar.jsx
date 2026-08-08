@@ -23,8 +23,8 @@ export default function Topbar() {
                     <span>Spotisee</span>
                 </div>
                 {loggedIn ?
-                    <Button variant="contained-primary" onClick={loginButtonPress} style={{}}>Sign In</Button> :
-                    <div>signed in</div>
+                    <div>signed in</div> :
+                    <Button variant="contained-primary" onClick={loginButtonPress} style={{}}>Sign In</Button>
                 }
             </div>
         </AppBar>
