@@ -1,27 +1,68 @@
+import {Box, Button, Link, Paper, Stack, TextField, Typography} from "@mui/material";
 import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function Login() {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loginError, setLoginError] = useState(false);
 
-    const [zipFile, setZipFile] = useState(null);
+    const navigate = useNavigate();
 
+    function signInButtonPress() {
 
-    const handleFileChange = (event) => {
-        setZipFile(event.target.files[0]);
-    }
-    const handleFileUpload = () => {
-        const formData = new FormData();
-        formData.set("file", zipFile);
-
-        fetch("api/upload-data", {
+        fetch("/api/auth/login", {
             method: "POST",
-            body: formData
-        }).then(r => console.log("res: ", r))
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({username: username, password: password})
+        }).then(r => {
+            if (r.status === 200) {
+                r.json().then(json => {
+                    if (json["token"] !== undefined) {
+                        setLoginError(false);
+                        localStorage.setItem("loggedIn", "false");
+                        localStorage.setItem("authToken", json["token"])
+                        navigate("/");
+                    }
+                });
+            } else {
+                setLoginError(true);
+            }
+        })
     }
 
     return (
-        <div>
-            <input type="file" accept=".zip" onChange={handleFileChange} />
-            <button onClick={handleFileUpload}> Upload </button>
+        <div className="page" style={{alignContent: "center"}}>
+            <Paper style={{width: "400px", margin: "auto", padding: "20px 50px", borderRadius: "12px"}}>
+                <form>
+                    <Stack spacing={2}>
+                        <Typography variant="h5">Login</Typography>
+                        <TextField id="outlined"
+                                   label="Username"
+                                   value={username}
+                                   error={loginError}
+                                   onChange={(e) => {
+                                       setUsername(e.target.value)
+                                   }}></TextField>
+                        <TextField id="outlined-password" label="Password" type="password" value={password}
+                                   error={loginError}
+                                   onChange={(e) => {
+                                       setPassword(e.target.value)
+                                   }}></TextField>
+                        {loginError ?
+                            <Typography variant="subtitle2" style={{color: "red"}}>Incorrect Username or Password</Typography>
+                            : <></>
+                        }
+                        <Button variant="contained" onClick={signInButtonPress}> Sign In </Button>
+                        <Typography variant="body2">
+                            No account? {" "}
+                            <Link href="/register">Register</Link>
+                        </Typography>
+                    </Stack>
+                </form>
+            </Paper>
         </div>
     )
 }

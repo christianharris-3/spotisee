@@ -1,30 +1,32 @@
 import "./topbar.css";
-import "../Buttons/Button.jsx";
-import Button from "../Buttons/Button.jsx";
 import LogoBw from "../svg/LogoBw.jsx";
+import {useNavigate} from "react-router-dom";
+import {AppBar, Button, IconButton, SvgIcon, Toolbar} from "@mui/material";
 
 export default function Topbar() {
-    const loggedIn = false;
+    let loggedIn = false;
+    const navigate = useNavigate();
+
+    async function loginButtonPress() {
+        navigate("/login");
+    }
+
+    if (localStorage.getItem("loggedIn") === "true") {
+        loggedIn = true;
+    }
 
     return (
-        <header className="top-bar">
+        <AppBar position="static" style={{height: 50}}>
             <div className="top-divider">
-                <div style={{width: "20%", display:"flex", gap: 12}}>
-                    <LogoBw width={50} height={20} />
+                <div style={{width: "20%", display: "flex", gap: 12, height: "100%", alignItems: "center"}}>
+                    <LogoBw width={50} height={20} homeOnClick={true}/>
                     <span>Spotisee</span>
                 </div>
-                <div>
-                    {loggedIn ?
-                        <div>
-
-                        </div>
-                        :
-                        <div style={{flex: 1, padding: 0}}>
-                            <Button text="Sign In"/>
-                        </div>
-                    }
-                </div>
+                {loggedIn ?
+                    <Button variant="contained-primary" onClick={loginButtonPress} style={{}}>Sign In</Button> :
+                    <div>signed in</div>
+                }
             </div>
-        </header>
+        </AppBar>
     );
 }

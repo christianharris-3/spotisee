@@ -4,6 +4,8 @@ import com.spotisee.app.config.SpotiseeAuthenticator;
 import com.spotisee.app.dao.AuthDao;
 import com.spotisee.app.models.User;
 import com.spotisee.app.models.requests.LoginRequest;
+import com.spotisee.app.models.response.ErrorResponse;
+import com.spotisee.app.models.response.TokenResponse;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -28,13 +30,13 @@ public class LoginResource {
     @Path("login")
     public Response login(@Valid @NotNull LoginRequest request) {
         Optional<String> token = spotiseeAuthenticator.generateToken(
-            request.getUsername(),
-            request.getPassword()
+                request.getUsername(),
+                request.getPassword()
         );
         if (token.isPresent()) {
-            return Response.ok(token.get()).build();
+            return Response.ok(new TokenResponse(token.get())).build();
         }
-        return Response.status(401).build();
+        return Response.status(401).entity(new ErrorResponse(401, "invalid username or password")).build();
     }
 
     @POST
