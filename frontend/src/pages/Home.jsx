@@ -8,6 +8,7 @@ export default function Home() {
     const [zipFile, setZipFile] = useState(null);
     const [fileProcessing, setFileProcessing] = useState(false);
     const [fileProcessed, setFileProcessed] = useState(false);
+    const [fileValid, setFileValid] = useState(null);
 
     const navigate = useNavigate();
     let loggedIn = false;
@@ -30,8 +31,11 @@ export default function Home() {
             method: "POST",
             body: formData
         }).then(r => {
+            setFileProcessed(true);
             if (r.ok) {
-                setFileProcessed(true);
+                setFileValid(true);
+            } else {
+                setFileValid(false);
             }
         })
     }
@@ -39,6 +43,8 @@ export default function Home() {
     const doneUpload = () => {
         setFileProcessed(false);
         setFileProcessing(false);
+        setFileValid(null);
+        setZipFile(null);
     }
 
 
@@ -57,9 +63,16 @@ export default function Home() {
                         <div style={{margin: "20px"
                         }}>
                             {fileProcessed ?
-                                <Alert icon={<Check/> } severity="success" onClose={doneUpload} style={{width: "fit-content", margin: "auto"}}>
-                                    Upload Complete
-                                </Alert> :
+                                <div>
+                                    {fileValid ?
+                                    <Alert severity="success" onClose={doneUpload} style={{width: "fit-content", margin: "auto"}}>
+                                        Upload Complete
+                                    </Alert> :
+                                    <Alert severity="error" onClose={doneUpload} style={{width: "fit-content", margin: "auto"}}>
+                                        Upload Failed
+                                    </Alert>
+                                    }
+                                </div> :
                                 <div>
                                     {fileProcessing ?
                                         <div style={{borderStyle: "solid", borderWidth: "1px", width: "fit-content", margin: "auto", padding: "10px", display: "flex", alignItems: "center", gap: "10px", borderRadius: "5px"}}>
