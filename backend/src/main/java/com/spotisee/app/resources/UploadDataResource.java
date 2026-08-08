@@ -3,6 +3,7 @@ package com.spotisee.app.resources;
 import com.spotisee.app.dao.UploadDao;
 import com.spotisee.app.managers.UploadDataManager;
 import com.spotisee.app.models.User;
+import io.dropwizard.auth.Auth;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -36,19 +37,20 @@ public class UploadDataResource {
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadZip(//@Auth User user,
+    public Response uploadZip(@Auth User user,
             @FormDataParam("file") InputStream file
     ) {
-        User user = new User(1, "chris", Set.of());
+        
         log.info("File Uploaded {}", file);
+        long uploadId;
         try (ZipInputStream zipInputStream = new ZipInputStream(file)) {
-            uploadDataManager.storeZipFile(zipInputStream, user.getUserId());
+            uploadId = uploadDataManager.storeZipFile(zipInputStream, user.getUserId());
         } catch (IOException e) {
             log.error("throwing {}", e.getMessage());
             return Response.status(400, String.format("Error loading jsons from zip file %s", e.getMessage())).build();
         }
 
-        return Response.accepted().build();
+        return Response.accepted(uploadId).build();
     }
 
 

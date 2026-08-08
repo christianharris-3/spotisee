@@ -1,10 +1,11 @@
 import "./topbar.css";
 import LogoBw from "../svg/LogoBw.jsx";
 import {useNavigate} from "react-router-dom";
-import {AppBar, Button, IconButton, SvgIcon, Toolbar} from "@mui/material";
+import {AppBar, Avatar, Box, Button, IconButton, SvgIcon, Toolbar, Typography} from "@mui/material";
 
 export default function Topbar() {
     let loggedIn = false;
+    let username = null;
     const navigate = useNavigate();
 
     async function loginButtonPress() {
@@ -13,7 +14,9 @@ export default function Topbar() {
 
     if (localStorage.getItem("loggedIn") === "true") {
         loggedIn = true;
+        username = localStorage.getItem("username")
     }
+    console.log("username: ", username);
 
     return (
         <AppBar position="static" style={{height: 50}}>
@@ -23,7 +26,10 @@ export default function Topbar() {
                     <span>Spotisee</span>
                 </div>
                 {loggedIn ?
-                    <div>signed in</div> :
+                    <Box style={{display: "flex", alignItems: "center", gap: "8px"}}>
+                        <span>{username}</span>
+                        <Avatar alt={username}/>
+                    </Box>:
                     <Button variant="contained-primary" onClick={loginButtonPress} style={{}}>Sign In</Button>
                 }
             </div>
