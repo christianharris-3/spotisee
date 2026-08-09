@@ -1,22 +1,34 @@
 import "./topbar.css";
 import LogoBw from "../svg/LogoBw.jsx";
 import {useNavigate} from "react-router-dom";
-import {AppBar, Avatar, Box, Button, IconButton, SvgIcon, Toolbar, Typography} from "@mui/material";
+import {AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, SvgIcon, Toolbar, Typography} from "@mui/material";
+import UserAvatar from "../UserAvatar.jsx";
+import {useState} from "react";
 
 export default function Topbar() {
+    // const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    // const [menuAnchor, setMenuAnchor] = useState(null);
+
+    // const openMenu = (event) => {
+    //     setMenuAnchor(event.currentTarget);
+    // }
+
     let loggedIn = false;
     let username = null;
     const navigate = useNavigate();
 
-    async function loginButtonPress() {
+    function loginButtonPress() {
         navigate("/login");
+    }
+
+    function profileButtonPress() {
+        navigate("/profile");
     }
 
     if (localStorage.getItem("loggedIn") === "true") {
         loggedIn = true;
         username = localStorage.getItem("username")
     }
-    console.log("username: ", username);
 
     return (
         <AppBar position="static" style={{height: 50}}>
@@ -27,8 +39,8 @@ export default function Topbar() {
                 </div>
                 {loggedIn ?
                     <Box style={{display: "flex", alignItems: "center", gap: "8px"}}>
-                        <span>{username}</span>
-                        <Avatar alt={username}/>
+                        <span onClick={profileButtonPress}>{username}</span>
+                        <UserAvatar username={username} onClick={profileButtonPress} style={{cursor: "pointer"}}/>
                     </Box>:
                     <Button variant="contained-primary" onClick={loginButtonPress} style={{}}>Sign In</Button>
                 }

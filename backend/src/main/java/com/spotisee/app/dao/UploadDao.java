@@ -1,12 +1,42 @@
 package com.spotisee.app.dao;
 
+import com.spotisee.app.models.dao.UploadInfo;
+import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface UploadDao {
+
+    @RegisterBeanMapper(UploadInfo.class)
+    @SqlQuery("""
+            SELECT Upload.uploadId,
+                   Upload.uploadName,
+                   COUNT(UploadItem.uploadItemId) as itemCount,
+                   MIN(UploadItem.timestamp) as startDate,
+                   MAX(UploadItem.timestamp) as endDate
+            FROM Upload LEFT JOIN UploadItem
+            ON Upload.uploadid = UploadItem.uploadId
+            WHERE (Upload.userId = :userId)
+            GROUP BY Upload.uploadId;
+            """)
+    List<UploadInfo> getUploadInfo(@Bind("userId") long userId);
+
+    @SqlUpdate("""
+            DELETE FROM Upload
+            WHERE :uploadId = uploadId;
+            """)
+    void deleteUpload(@Bind("uploadId") long uploadId);
+
+    @SqlUpdate("""
+            DELETE FROM UploadItem
+            WHERE :uploadId = uploadId;
+            """)
+    void deleteUploadItems(@Bind("uploadId") long uploadId);
 
     @SqlUpdate("""
         INSERT INTO Upload (userId)

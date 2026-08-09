@@ -25,6 +25,7 @@ export default function Login() {
                         localStorage.setItem("loggedIn", "true");
                         localStorage.setItem("username", username);
                         localStorage.setItem("authToken", json["token"])
+                        console.log(json);
                         navigate("/");
                     }
                 });

@@ -3,12 +3,14 @@ package com.spotisee.app.managers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spotisee.app.dao.UploadDao;
+import com.spotisee.app.models.dao.UploadInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -22,6 +24,15 @@ public class UploadDataManager {
     public UploadDataManager(UploadDao uploadDao) {
         this.uploadDao = uploadDao;
         this.objectMapper = new ObjectMapper();
+    }
+
+    public List<UploadInfo> getUploads(long userId) {
+        return uploadDao.getUploadInfo(userId);
+    }
+
+    public void deleteUpload(long uploadId) {
+        uploadDao.deleteUpload(uploadId);
+        uploadDao.deleteUploadItems(uploadId);
     }
 
     public long storeZipFile(ZipInputStream zipInputStream, long userId) throws IOException {

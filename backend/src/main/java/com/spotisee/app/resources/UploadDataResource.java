@@ -2,7 +2,9 @@ package com.spotisee.app.resources;
 
 import com.spotisee.app.dao.UploadDao;
 import com.spotisee.app.managers.UploadDataManager;
+import com.spotisee.app.managers.UserValidationManager;
 import com.spotisee.app.models.User;
+import com.spotisee.app.models.dao.UploadInfo;
 import io.dropwizard.auth.Auth;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
 
@@ -24,15 +27,25 @@ public class UploadDataResource {
 
     private static final Logger log = LoggerFactory.getLogger(UploadDataResource.class);
     private final UploadDataManager uploadDataManager;
+    private final UserValidationManager userValidationManager;
 
 
-    public UploadDataResource(UploadDataManager uploadDataManager) {
+    public UploadDataResource(UploadDataManager uploadDataManager, UserValidationManager userValidationManager) {
         this.uploadDataManager = uploadDataManager;
+        this.userValidationManager = userValidationManager;
     }
 
     @GET
-    public Response listUploads() {
-        return Response.accepted().build();
+    public Response listUploads(@Auth User user) {
+        List<UploadInfo> uploadInfo = uploadDataManager.getUploads(user.getUserId());
+        return Response.ok(uploadInfo).build();
+    }
+
+    @DELETE
+    public Response deleteUpload(@Auth User user, long uploadId) {
+        userValidationManager.validateUserHasUpload(user, uploadId);
+        uploadDataManager.deleteUpload(uploadId);
+        return Response.ok().build();
     }
 
     @POST
@@ -40,7 +53,7 @@ public class UploadDataResource {
     public Response uploadZip(@Auth User user,
             @FormDataParam("file") InputStream file
     ) {
-        
+
         log.info("File Uploaded {}", file);
         long uploadId;
         try (ZipInputStream zipInputStream = new ZipInputStream(file)) {
