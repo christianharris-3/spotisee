@@ -1,5 +1,5 @@
 import {
-    Button,
+    Button, Checkbox,
     Divider,
     Paper,
     Table,
@@ -22,6 +22,7 @@ export default function Profile() {
     const navigate = useNavigate();
     const [uploadItems, setUploadItems] = useState(null);
     const [triggerDataReload, setTriggerDataReload] = useState(1);
+    const [selectedUpload, setSelectedUpload] = useState(null);
 
     useEffect(() => {
         if (localStorage.getItem("loggedIn") !== "true") {
@@ -39,11 +40,20 @@ export default function Profile() {
             method: "GET",
             headers: getHeaders()
         }).then(r => r.json()).then(json => {
+            if (json.length > 0) {
+                setSelectedUpload(json[0].uploadId);
+            }
             setUploadItems(Object.fromEntries(
                 json.map(item => [item.uploadId, item])
             ));
         });
     }, [triggerDataReload]);
+
+    useEffect(() => {
+        if (selectedUpload !== null) {
+            localStorage.setItem("activeUploadId", selectedUpload.toString())
+        }
+    }, [selectedUpload]);
 
     function runTriggerDataReload() {
         setTriggerDataReload(triggerDataReload + 1);
@@ -57,6 +67,11 @@ export default function Profile() {
         let month = date.toLocaleString("en-gb", {month: "short"});
         return `${month} ${date.getFullYear()}`
     }
+
+    function uploadSelected(uploadId) {
+        setSelectedUpload(uploadId);
+    }
+
 
 
     return (
@@ -94,7 +109,7 @@ export default function Profile() {
                                 <Table>
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Id</TableCell>
+                                            <TableCell>Active</TableCell>
                                             <TableCell>Name</TableCell>
                                             <TableCell>Items</TableCell>
                                             <TableCell>Start</TableCell>
@@ -104,8 +119,10 @@ export default function Profile() {
                                     </TableHead>
                                     <TableBody>
                                         {Object.values(uploadItems).map((row) => (
-                                            <TableRow hover>
-                                                <TableCell>{row.uploadId}</TableCell>
+                                            <TableRow hover key={row.uploadId}>
+                                                <TableCell>
+                                                    <Checkbox checked={selectedUpload === row.uploadId} onClick={() => {uploadSelected(row.uploadId)}} size="large"/>
+                                                </TableCell>
                                                 <TableCell sx={{padding: "1px", paddingTop: "8px", width: "270px"}}>
                                                     <EditableText row={row} triggerDataReload={runTriggerDataReload}/>
                                                 </TableCell>
