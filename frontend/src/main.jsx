@@ -5,6 +5,8 @@ import Layout from "./Layout.jsx";
 import Home from "./pages/Home.jsx";
 import Upload from "./pages/Upload.jsx";
 import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Profile from "./pages/Profile.jsx";
 
 
 const router = createBrowserRouter([
@@ -13,7 +15,9 @@ const router = createBrowserRouter([
         children: [
             {path: "/", element: <Home />},
             {path: "/upload", element: <Upload />},
-            {path: "/login", element: <Login />}
+            {path: "/login", element: <Login />},
+            {path: "/register", element: <Register />},
+            {path: "/profile", element: <Profile />}
         ]
     }
 ])

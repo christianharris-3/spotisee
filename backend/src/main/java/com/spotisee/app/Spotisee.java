@@ -43,7 +43,7 @@ public class Spotisee extends Application<AppConfiguration> {
         GraphingDao graphingDao = jdbi.onDemand(GraphingDao.class);
 
         // Managers
-        UploadDataManager uploadDataManager = new UploadDataManager(uploadDao);
+        UploadDataManager uploadDataManager = new UploadDataManager(uploadDao, authDao);
         MusicDataManager musicDataManager = new MusicDataManager(songDataDao);
         UserValidationManager userValidationManager = new UserValidationManager(authDao);
         SelectionManager selectionManager = new SelectionManager(selectionDao);
@@ -67,7 +67,7 @@ public class Spotisee extends Application<AppConfiguration> {
         // API endpoints
         environment.jersey().register(new LoginResource(authenticator));
         environment.jersey().register(new StatAggregationResource(musicDataManager, userValidationManager));
-        environment.jersey().register(new UploadDataResource(uploadDataManager));
+        environment.jersey().register(new UploadDataResource(uploadDataManager, userValidationManager));
         environment.jersey().register(new SelectionResource(selectionManager, userValidationManager));
         environment.jersey().register(new GraphingResource(graphingManager, userValidationManager));
     }

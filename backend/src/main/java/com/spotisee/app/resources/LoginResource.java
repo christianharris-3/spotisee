@@ -6,12 +6,14 @@ import com.spotisee.app.models.User;
 import com.spotisee.app.models.requests.LoginRequest;
 import com.spotisee.app.models.response.ErrorResponse;
 import com.spotisee.app.models.response.TokenResponse;
+import io.dropwizard.auth.Auth;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 
 import java.util.Optional;
 
@@ -48,5 +50,10 @@ public class LoginResource {
         }
         spotiseeAuthenticator.register(request.getUsername(), request.getPassword());
         return Response.accepted().build();
+    }
+
+    @GET
+    public Response lifelineCheck(@Auth User user) {
+        return Response.ok(user).build();
     }
 }

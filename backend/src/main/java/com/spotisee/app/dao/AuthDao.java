@@ -14,7 +14,7 @@ import java.util.Set;
 public interface AuthDao {
     @RegisterBeanMapper(UserFromDb.class)
     @SqlQuery("""
-            SELECT userId, username, passwordHash
+            SELECT userId, activeUploadId, username, passwordHash
             FROM Users
             WHERE (:username = username);
             """)
@@ -63,4 +63,11 @@ public interface AuthDao {
             @Bind("selectionId") long selectionId,
             @Bind("selectionItemId") long selectionItemId
     );
+
+    @SqlUpdate("""
+            UPDATE Users
+            SET activeUploadId = :uploadId
+            WHERE userId = :userId;
+            """)
+    void setActiveUpload(@Bind("userId") long userId, @Bind("uploadId") long uploadId);
 }

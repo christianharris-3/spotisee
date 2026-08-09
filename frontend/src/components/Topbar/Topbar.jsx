@@ -1,19 +1,44 @@
 import "./topbar.css";
 import LogoBw from "../svg/LogoBw.jsx";
 import {useNavigate} from "react-router-dom";
-import {AppBar, Button, IconButton, SvgIcon, Toolbar} from "@mui/material";
+import {AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, SvgIcon, Toolbar, Typography} from "@mui/material";
+import UserAvatar from "../UserAvatar.jsx";
+import {useState} from "react";
+import {getHeaders, logout} from "../../utils/utils.js";
 
 export default function Topbar() {
-    let loggedIn = false;
+    const [loggedIn, setLoggedIn] = useState(false);
+    let username = null;
     const navigate = useNavigate();
 
-    async function loginButtonPress() {
+    function loginButtonPress() {
         navigate("/login");
     }
 
-    if (localStorage.getItem("loggedIn") === "true") {
-        loggedIn = true;
+
+    function profileButtonPress() {
+        navigate("/profile");
     }
+
+    function lifeLine() {
+        fetch("/api/auth", {method: "GET", headers: getHeaders()}).then(
+            r => {
+                if (r.ok) {
+                    r.json().then(
+                        json => {
+                            localStorage.setItem("username", json["username"]);
+                            localStorage.setItem("activeUploadId", json["activeUploadId"])
+                            setLoggedIn(true);
+                        });
+                } else {
+                    setLoggedIn(false);
+                    logout();
+                }
+            }
+        )
+    }
+    username = localStorage.getItem("username")
+    lifeLine()
 
     return (
         <AppBar position="static" style={{height: 50}}>
@@ -23,8 +48,11 @@ export default function Topbar() {
                     <span>Spotisee</span>
                 </div>
                 {loggedIn ?
-                    <Button variant="contained-primary" onClick={loginButtonPress} style={{}}>Sign In</Button> :
-                    <div>signed in</div>
+                    <Box style={{display: "flex", alignItems: "center", gap: "8px"}}>
+                        <span onClick={profileButtonPress}>{username}</span>
+                        <UserAvatar username={username} onClick={profileButtonPress} sx={{cursor: "pointer"}}/>
+                    </Box>:
+                    <Button variant="contained-primary" onClick={loginButtonPress} style={{}}>Sign In</Button>
                 }
             </div>
         </AppBar>

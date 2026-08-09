@@ -22,7 +22,8 @@ export default function Login() {
                 r.json().then(json => {
                     if (json["token"] !== undefined) {
                         setLoginError(false);
-                        localStorage.setItem("loggedIn", "false");
+                        localStorage.setItem("loggedIn", "true");
+                        localStorage.setItem("username", username);
                         localStorage.setItem("authToken", json["token"])
                         navigate("/");
                     }
@@ -34,35 +35,37 @@ export default function Login() {
     }
 
     return (
-        <div className="page" style={{alignContent: "center"}}>
-            <Paper style={{width: "400px", margin: "auto", padding: "20px 50px", borderRadius: "12px"}}>
-                <form>
-                    <Stack spacing={2}>
-                        <Typography variant="h5">Login</Typography>
-                        <TextField id="outlined"
-                                   label="Username"
-                                   value={username}
-                                   error={loginError}
-                                   onChange={(e) => {
-                                       setUsername(e.target.value)
-                                   }}></TextField>
-                        <TextField id="outlined-password" label="Password" type="password" value={password}
-                                   error={loginError}
-                                   onChange={(e) => {
-                                       setPassword(e.target.value)
-                                   }}></TextField>
-                        {loginError ?
-                            <Typography variant="subtitle2" style={{color: "red"}}>Incorrect Username or Password</Typography>
-                            : <></>
-                        }
-                        <Button variant="contained" onClick={signInButtonPress}> Sign In </Button>
-                        <Typography variant="body2">
-                            No account? {" "}
-                            <Link href="/register">Register</Link>
-                        </Typography>
-                    </Stack>
-                </form>
-            </Paper>
+        <div className="page">
+            <div style={{paddingTop: "25vh"}}>
+                <Paper style={{width: "400px", margin: "auto", padding: "20px 50px", borderRadius: "12px"}}>
+                    <form>
+                        <Stack spacing={2}>
+                            <Typography variant="h5">Login</Typography>
+                            <TextField id="outlined"
+                                       label="Username"
+                                       value={username}
+                                       error={loginError}
+                                       onChange={(e) => {
+                                           setUsername(e.target.value)
+                                       }}></TextField>
+                            <TextField id="outlined-password" label="Password" type="password" value={password}
+                                       error={loginError}
+                                       onChange={(e) => {
+                                           setPassword(e.target.value)
+                                       }}></TextField>
+                            {loginError ?
+                                <Typography variant="subtitle2" style={{color: "red"}}>Incorrect Username or Password</Typography>
+                                : <></>
+                            }
+                            <Button variant="contained" onClick={signInButtonPress}> Sign In </Button>
+                            <Typography variant="body2">
+                                No account? {" "}
+                                <Link href="/register">Register</Link>
+                            </Typography>
+                        </Stack>
+                    </form>
+                </Paper>
+            </div>
         </div>
     )
 }

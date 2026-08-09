@@ -2,13 +2,16 @@ package com.spotisee.app.managers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spotisee.app.dao.AuthDao;
 import com.spotisee.app.dao.UploadDao;
+import com.spotisee.app.models.dao.UploadInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -18,15 +21,37 @@ public class UploadDataManager {
 
     private final UploadDao uploadDao;
     private final ObjectMapper objectMapper;
+    private final AuthDao authDao;
 
-    public UploadDataManager(UploadDao uploadDao) {
+    public UploadDataManager(UploadDao uploadDao, AuthDao authDao) {
         this.uploadDao = uploadDao;
+        this.authDao = authDao;
         this.objectMapper = new ObjectMapper();
     }
 
+    public List<UploadInfo> getUploads(long userId) {
+        return uploadDao.getUploadInfo(userId);
+    }
+
+    public void deleteUpload(long uploadId) {
+        uploadDao.deleteUpload(uploadId);
+        uploadDao.deleteUploadItems(uploadId);
+    }
+
+    public void updateUpload(long uploadId, String uploadName) {
+        uploadDao.updateUpload(uploadId, uploadName);
+    }
+
+    public void setActiveUpload(long userId, long uploadId) {
+        authDao.setActiveUpload(userId, uploadId);
+    }
+
+
     public long storeZipFile(ZipInputStream zipInputStream, long userId) throws IOException {
 
-        long uploadId = uploadDao.createUpload(userId);
+        String uploadName = generateUploadName(userId
+        );
+        long uploadId = uploadDao.createUpload(userId, uploadName);
 
         ZipEntry entry;
 
@@ -109,5 +134,17 @@ public class UploadDataManager {
         catch (DateTimeParseException e) {
             return null;
         }
+    }
+
+    private String generateUploadName(long userId) {
+        List<UploadInfo> uploads = getUploads(userId);
+        long maxId = 0;
+        for (UploadInfo upload : uploads) {
+            if (upload.getUploadId() > maxId) {
+                maxId = upload.getUploadId();
+            }
+        }
+
+        return String.format("Upload %s", maxId+1);
     }
 }

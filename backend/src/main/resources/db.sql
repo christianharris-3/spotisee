@@ -11,7 +11,8 @@ DROP TABLE IF EXISTS SelectionItem;
 CREATE TABLE Users(
     userId BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) NOT NULL,
-    passwordHash VARCHAR(255) NOT NULL
+    passwordHash VARCHAR(255) NOT NULL,
+    activeUploadId BIGINT
 );
 
 CREATE TABLE UserRole(
