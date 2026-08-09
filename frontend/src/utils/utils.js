@@ -6,3 +6,9 @@ export function getHeaders() {
         Authorization: `Bearer ${token}`
     }
 }
+
+export function logout() {
+    localStorage.removeItem("loggedIn");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("username");
+}

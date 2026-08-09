@@ -67,7 +67,7 @@ public class Spotisee extends Application<AppConfiguration> {
         // API endpoints
         environment.jersey().register(new LoginResource(authenticator));
         environment.jersey().register(new StatAggregationResource(musicDataManager, userValidationManager));
-        environment.jersey().register(new UploadDataResource(uploadDataManager));
+        environment.jersey().register(new UploadDataResource(uploadDataManager, userValidationManager));
         environment.jersey().register(new SelectionResource(selectionManager, userValidationManager));
         environment.jersey().register(new GraphingResource(graphingManager, userValidationManager));
     }

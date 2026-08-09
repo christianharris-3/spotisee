@@ -4,16 +4,10 @@ import {useNavigate} from "react-router-dom";
 import {AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, SvgIcon, Toolbar, Typography} from "@mui/material";
 import UserAvatar from "../UserAvatar.jsx";
 import {useState} from "react";
+import {getHeaders, logout} from "../../utils/utils.js";
 
 export default function Topbar() {
-    // const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-    // const [menuAnchor, setMenuAnchor] = useState(null);
-
-    // const openMenu = (event) => {
-    //     setMenuAnchor(event.currentTarget);
-    // }
-
-    let loggedIn = false;
+    const [loggedIn, setLoggedIn] = useState(false);
     let username = null;
     const navigate = useNavigate();
 
@@ -21,14 +15,29 @@ export default function Topbar() {
         navigate("/login");
     }
 
+
     function profileButtonPress() {
         navigate("/profile");
     }
 
-    if (localStorage.getItem("loggedIn") === "true") {
-        loggedIn = true;
-        username = localStorage.getItem("username")
+    function lifeLine() {
+        fetch("/api/auth", {method: "GET", headers: getHeaders()}).then(
+            r => {
+                if (r.ok) {
+                    r.json().then(
+                        json => {
+                            localStorage.setItem("username", json["username"]);
+                            setLoggedIn(true);
+                        });
+                } else {
+                    setLoggedIn(false);
+                    logout();
+                }
+            }
+        )
     }
+    username = localStorage.getItem("username")
+    lifeLine()
 
     return (
         <AppBar position="static" style={{height: 50}}>
@@ -39,6 +48,7 @@ export default function Topbar() {
                 </div>
                 {loggedIn ?
                     <Box style={{display: "flex", alignItems: "center", gap: "8px"}}>
+                        <Button onClick={()=>{logout(); setLoggedIn(false)}} variant="contained-primary">logout</Button>
                         <span onClick={profileButtonPress}>{username}</span>
                         <UserAvatar username={username} onClick={profileButtonPress} style={{cursor: "pointer"}}/>
                     </Box>:

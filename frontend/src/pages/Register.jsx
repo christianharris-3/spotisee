@@ -89,7 +89,7 @@ export default function Register() {
                             <Button variant="contained" onClick={registerButtonPress}> Create Account </Button>
                             <Typography variant="body2">
                                 Already have an Account? {" "}
-                                <Link href="/register">Sign In</Link>
+                                <Link href="/login">Sign In</Link>
                             </Typography>
                         </Stack>
                     </form>
