@@ -4,7 +4,7 @@ import {AttachFile, UploadFile} from "@mui/icons-material";
 import {getHeaders} from "../utils/utils.js";
 import {useDropzone} from "react-dropzone";
 
-export default function UploadSection({...props}) {
+export default function UploadSection({triggerDataReload, ...props}) {
     const [zipFile, setZipFile] = useState(null);
     const [fileProcessing, setFileProcessing] = useState(false);
     const [fileProcessed, setFileProcessed] = useState(false);
@@ -15,11 +15,19 @@ export default function UploadSection({...props}) {
         accept: {
             "application/zip": [".zip"]
         },
+        noClick: (zipFile !== null),
         onDrop: acceptedFiles => {
-            setZipFile(acceptedFiles.at(0))
-            console.log(acceptedFiles);
+            if (acceptedFiles.length > 0) {
+                setZipFile(acceptedFiles.at(0))
+            }
         }
     });
+
+    function selectFilePressed(event) {
+        if (zipFile === null) {
+            event.preventDefault();
+        }
+    }
 
     const handleFileUpload = (e) => {
         e.preventDefault()
@@ -36,6 +44,7 @@ export default function UploadSection({...props}) {
             setFileProcessed(true);
             if (r.ok) {
                 setFileValid(true);
+                triggerDataReload()
             } else {
                 setFileValid(false);
             }
@@ -73,7 +82,7 @@ export default function UploadSection({...props}) {
                                     component="label"
                                     style={{marginTop: "10px", margin: "20px"}}
                                     startIcon={<AttachFile />}
-                                    onClick={(e) => {e.preventDefault()}}>
+                                    onClick={selectFilePressed}>
                                 Select File
                                 <input hidden type="file" {...getInputProps()}/>
                             </Button>
@@ -83,7 +92,7 @@ export default function UploadSection({...props}) {
                                     <></> :
                                     <div style={{marginTop: "15px", gap: "10px", display: "flex", alignItems: "center", justifyContent: "center"}}>
                                         <Chip label={zipFile.name} color="default" onDelete={() => setZipFile(null)}/>
-                                        <Button variant="outlined" startIcon={<UploadFile />} onClick={handleFileUpload}>Upload</Button>
+                                        <Button variant="outlined" startIcon={<UploadFile />} onClick={handleFileUpload} >Upload</Button>
                                     </div>
                                 }
                             </div>

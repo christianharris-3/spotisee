@@ -35,9 +35,15 @@ public class UploadDataManager {
         uploadDao.deleteUploadItems(uploadId);
     }
 
+    public void updateUpload(long uploadId, String uploadName) {
+        uploadDao.updateUpload(uploadId, uploadName);
+    }
+
     public long storeZipFile(ZipInputStream zipInputStream, long userId) throws IOException {
 
-        long uploadId = uploadDao.createUpload(userId);
+        String uploadName = generateUploadName(userId
+        );
+        long uploadId = uploadDao.createUpload(userId, uploadName);
 
         ZipEntry entry;
 
@@ -120,5 +126,17 @@ public class UploadDataManager {
         catch (DateTimeParseException e) {
             return null;
         }
+    }
+
+    private String generateUploadName(long userId) {
+        List<UploadInfo> uploads = getUploads(userId);
+        long maxId = 0;
+        for (UploadInfo upload : uploads) {
+            if (upload.getUploadId() > maxId) {
+                maxId = upload.getUploadId();
+            }
+        }
+
+        return String.format("Upload %s", maxId+1);
     }
 }

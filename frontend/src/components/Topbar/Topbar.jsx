@@ -48,9 +48,8 @@ export default function Topbar() {
                 </div>
                 {loggedIn ?
                     <Box style={{display: "flex", alignItems: "center", gap: "8px"}}>
-                        <Button onClick={()=>{logout(); setLoggedIn(false)}} variant="contained-primary">logout</Button>
                         <span onClick={profileButtonPress}>{username}</span>
-                        <UserAvatar username={username} onClick={profileButtonPress} style={{cursor: "pointer"}}/>
+                        <UserAvatar username={username} onClick={profileButtonPress} sx={{cursor: "pointer"}}/>
                     </Box>:
                     <Button variant="contained-primary" onClick={loginButtonPress} style={{}}>Sign In</Button>
                 }

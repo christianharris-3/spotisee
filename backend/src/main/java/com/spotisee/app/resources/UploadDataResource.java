@@ -5,7 +5,9 @@ import com.spotisee.app.managers.UploadDataManager;
 import com.spotisee.app.managers.UserValidationManager;
 import com.spotisee.app.models.User;
 import com.spotisee.app.models.dao.UploadInfo;
+import com.spotisee.app.models.requests.UpdateUploadRequest;
 import io.dropwizard.auth.Auth;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -41,8 +43,20 @@ public class UploadDataResource {
         return Response.ok(uploadInfo).build();
     }
 
+    @PUT
+    @Path("/{uploadId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateUploadName(@Auth User user,
+                                     @PathParam("uploadId") long uploadId,
+                                     @NotNull UpdateUploadRequest updateUploadRequest) {
+        userValidationManager.validateUserHasUpload(user, uploadId);
+        uploadDataManager.updateUpload(uploadId, updateUploadRequest.getUploadName());
+        return Response.ok().build();
+    }
+
     @DELETE
-    public Response deleteUpload(@Auth User user, long uploadId) {
+    @Path("/{uploadId}")
+    public Response deleteUpload(@Auth User user, @PathParam("uploadId") long uploadId) {
         userValidationManager.validateUserHasUpload(user, uploadId);
         uploadDataManager.deleteUpload(uploadId);
         return Response.ok().build();
@@ -51,7 +65,7 @@ public class UploadDataResource {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadZip(@Auth User user,
-            @FormDataParam("file") InputStream file
+                              @FormDataParam("file") InputStream file
     ) {
 
         log.info("File Uploaded {}", file);

@@ -19,7 +19,7 @@ export default function LogoBw(info) {
             height: height,
             position: "relative"
         }}>
-            <svg style={{position: "absolute", top: -offset}} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+            <svg style={{position: "absolute", top: -offset, cursor: "pointer"}} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
 
                 <path fill="#000000" d="M 0 8 L 1 7 C 5 3 7 3 8 3 C 9 3 11 3 15 7 L 16 8 L 15 9 C 11 13 9 13 8 13 C 7 13 5 13 1 9 Z"/>
 

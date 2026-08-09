@@ -22,9 +22,18 @@ public interface UploadDao {
             FROM Upload LEFT JOIN UploadItem
             ON Upload.uploadid = UploadItem.uploadId
             WHERE (Upload.userId = :userId)
-            GROUP BY Upload.uploadId;
+            GROUP BY Upload.uploadId
+            ORDER BY Upload.uploadId;
             """)
     List<UploadInfo> getUploadInfo(@Bind("userId") long userId);
+
+    @SqlUpdate("""
+            UPDATE Upload
+            SET uploadName = :uploadName
+            WHERE :uploadId = uploadId;
+            """)
+    void updateUpload(@Bind("uploadId") long uploadId, @Bind("uploadName") String uploadName);
+
 
     @SqlUpdate("""
             DELETE FROM Upload
@@ -39,11 +48,11 @@ public interface UploadDao {
     void deleteUploadItems(@Bind("uploadId") long uploadId);
 
     @SqlUpdate("""
-        INSERT INTO Upload (userId)
-        VALUES (:userId);
+        INSERT INTO Upload (userId, uploadName)
+        VALUES (:userId, :uploadName);
     """)
     @GetGeneratedKeys
-    long createUpload(@Bind("userId") long userId);
+    long createUpload(@Bind("userId") long userId, @Bind("uploadName") String uploadName);
 
     @SqlUpdate("""
         INSERT INTO UploadItem (
