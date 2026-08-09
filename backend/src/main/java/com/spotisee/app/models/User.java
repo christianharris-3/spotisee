@@ -10,6 +10,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class User implements Principal {
     private long userId;
+    private long activeUploadId;
     private String username;
     private Set<String> roles;
 

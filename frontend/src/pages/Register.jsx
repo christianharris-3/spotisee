@@ -41,7 +41,6 @@ export default function Register() {
             if (r.ok) {
                 navigate("/login");
             } else {
-                console.log(r);
                 setInvalidUsernameError(true);
             }
         })

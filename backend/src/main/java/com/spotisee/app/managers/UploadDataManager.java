@@ -2,6 +2,7 @@ package com.spotisee.app.managers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spotisee.app.dao.AuthDao;
 import com.spotisee.app.dao.UploadDao;
 import com.spotisee.app.models.dao.UploadInfo;
 import org.slf4j.Logger;
@@ -20,9 +21,11 @@ public class UploadDataManager {
 
     private final UploadDao uploadDao;
     private final ObjectMapper objectMapper;
+    private final AuthDao authDao;
 
-    public UploadDataManager(UploadDao uploadDao) {
+    public UploadDataManager(UploadDao uploadDao, AuthDao authDao) {
         this.uploadDao = uploadDao;
+        this.authDao = authDao;
         this.objectMapper = new ObjectMapper();
     }
 
@@ -38,6 +41,11 @@ public class UploadDataManager {
     public void updateUpload(long uploadId, String uploadName) {
         uploadDao.updateUpload(uploadId, uploadName);
     }
+
+    public void setActiveUpload(long userId, long uploadId) {
+        authDao.setActiveUpload(userId, uploadId);
+    }
+
 
     public long storeZipFile(ZipInputStream zipInputStream, long userId) throws IOException {
 

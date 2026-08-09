@@ -47,7 +47,10 @@ public class SpotiseeAuthenticator implements Authenticator<String, User> {
         if (userFromDb.isPresent() && BCrypt.checkpw(password, userFromDb.get().getPasswordHash())) {
             Set<String> roles = authDao.getUserRoles(userFromDb.get().getUserId());
             return Optional.of(createToken(
-                    new User(userFromDb.get().getUserId(), userFromDb.get().getUsername(), roles)
+                    new User(userFromDb.get().getUserId(),
+                            userFromDb.get().getActiveUploadId(),
+                            userFromDb.get().getUsername(),
+                            roles)
             ));
         }
         return Optional.empty();
@@ -99,6 +102,7 @@ public class SpotiseeAuthenticator implements Authenticator<String, User> {
 
         return Optional.of(new User(
                 userFromDb.get().getUserId(),
+                userFromDb.get().getActiveUploadId(),
                 username,
                 authDao.getUserRoles(userFromDb.get().getUserId())
         ));

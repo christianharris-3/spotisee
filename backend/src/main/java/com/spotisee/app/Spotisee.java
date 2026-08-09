@@ -43,7 +43,7 @@ public class Spotisee extends Application<AppConfiguration> {
         GraphingDao graphingDao = jdbi.onDemand(GraphingDao.class);
 
         // Managers
-        UploadDataManager uploadDataManager = new UploadDataManager(uploadDao);
+        UploadDataManager uploadDataManager = new UploadDataManager(uploadDao, authDao);
         MusicDataManager musicDataManager = new MusicDataManager(songDataDao);
         UserValidationManager userValidationManager = new UserValidationManager(authDao);
         SelectionManager selectionManager = new SelectionManager(selectionDao);

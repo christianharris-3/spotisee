@@ -27,6 +27,7 @@ export default function Topbar() {
                     r.json().then(
                         json => {
                             localStorage.setItem("username", json["username"]);
+                            localStorage.setItem("activeUploadId", json["activeUploadId"])
                             setLoggedIn(true);
                         });
                 } else {

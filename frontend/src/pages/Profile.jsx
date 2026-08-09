@@ -52,6 +52,10 @@ export default function Profile() {
     useEffect(() => {
         if (selectedUpload !== null) {
             localStorage.setItem("activeUploadId", selectedUpload.toString())
+            fetch("/api/upload-data/select/"+selectedUpload, {
+                method: "POST",
+                headers: getHeaders()
+            }).then()
         }
     }, [selectedUpload]);
 

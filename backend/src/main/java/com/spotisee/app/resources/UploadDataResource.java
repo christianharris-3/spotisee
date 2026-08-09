@@ -63,6 +63,14 @@ public class UploadDataResource {
     }
 
     @POST
+    @Path("/select/{uploadId}")
+    public Response selectUpload(@Auth User user, @PathParam("uploadId") long uploadId) {
+        userValidationManager.validateUserHasUpload(user, uploadId);
+        uploadDataManager.setActiveUpload(user.getUserId(), uploadId);
+        return Response.ok().build();
+    }
+
+    @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadZip(@Auth User user,
                               @FormDataParam("file") InputStream file

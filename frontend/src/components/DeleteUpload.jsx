@@ -8,7 +8,6 @@ export default function DeleteUpload({uploadId, triggerDataReload}) {
 
     function deleteUpload() {
         setButtonLoading(true)
-        console.log("loading", uploadId)
         fetch("/api/upload-data/" + uploadId, {
             method: "DELETE", headers: getHeaders()
         }).then(r => {
