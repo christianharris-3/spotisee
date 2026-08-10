@@ -7,6 +7,7 @@ import Upload from "./pages/Upload.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Profile from "./pages/Profile.jsx";
+import TablePage from "./pages/TablePage.jsx";
 
 
 const router = createBrowserRouter([
@@ -17,7 +18,8 @@ const router = createBrowserRouter([
             {path: "/upload", element: <Upload />},
             {path: "/login", element: <Login />},
             {path: "/register", element: <Register />},
-            {path: "/profile", element: <Profile />}
+            {path: "/profile", element: <Profile />},
+            {path: "/table", element: <TablePage />}
         ]
     }
 ])

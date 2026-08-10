@@ -1,4 +1,5 @@
 /* styles/tokens.css */
+@import "tailwindcss";
 
 :root {
     /* ========================================
@@ -44,6 +45,7 @@
     --color-border: #e5e1d8;
     --color-border-light: #eeeae2;
     --color-border-strong: #cfc9bc;
+    --color-border-hover: #8e8981;
 
 
     /* ========================================
