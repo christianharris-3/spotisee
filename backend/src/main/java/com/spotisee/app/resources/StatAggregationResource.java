@@ -16,6 +16,7 @@ import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import static com.spotisee.app.config.Constants.TIMESTAMP_LOWER_BOUND;

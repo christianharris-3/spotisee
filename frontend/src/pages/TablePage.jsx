@@ -1,6 +1,6 @@
 import {Paper, Stack, TablePagination, ToggleButton, ToggleButtonGroup} from "@mui/material";
 import {useEffect, useState} from "react";
-import {getHeaders} from "../utils/utils.js";
+import {getHeaders, toDateString} from "../utils/utils.js";
 import SearchBox from "../components/SearchBox/SearchBox.jsx";
 import Selector from "../components/Selector/Selector.jsx";
 
@@ -14,6 +14,7 @@ export default function TablePage() {
 
     const [yearSelectionOptions, setYearSelectionOptions] = useState([]);
     const [yearSelection, setYearSelection] = useState(null);
+    const [monthSelection, setMonthSelection] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(100);
@@ -21,10 +22,10 @@ export default function TablePage() {
     const [tableData, setTableData] = useState([]);
 
 
-    let handleMovePage = (event, newPage) => {
+    const handleMovePage = (event, newPage) => {
         setCurrentPage(newPage);
     }
-    let handleChangePageSize = (event) => {
+    const handleChangePageSize = (event) => {
         setCurrentPage(0);
         setPageSize(parseInt(event.target.value, 10))
     }
@@ -33,13 +34,44 @@ export default function TablePage() {
         return localStorage.getItem('activeUploadId')
     }
 
+    const getDateRange = () => {
+        if (dateTypeSelection === "All") {
+            return {
+                startDate: new Date(2000, 0),
+                endDate: new Date(2040, 0)
+            }
+        } else if (dateTypeSelection === "Year") {
+            console.log(yearSelection)
+            return {
+                startDate: new Date(yearSelection, 0),
+                endDate: new Date(yearSelection+1, 0)
+            }
+        } else if (dateTypeSelection === "Month") {
+            return {
+                startDate: new Date(yearSelection, monthSelection),
+                endDate: new Date(yearSelection, monthSelection+1)
+            }
+        }
+
+
+
+        return {
+            startDate: new Date(2000, 1),
+            endDate: new Date(2040, 1)
+        }
+    }
+
     useEffect(() => {
+        let dates = getDateRange();
         const params = new URLSearchParams({
             searchTerm: searchTerm,
+            start: toDateString(dates.startDate),
+            end: toDateString(dates.endDate),
             pageSize: pageSize,
             pageIndex: currentPage,
             sortBy: sortBy
         });
+        console.log("calling", params.toString(), dates)
         fetch(`/api/aggregate/${itemType}/${getUploadId()}?${params}`, {
             method: "GET",
             headers: getHeaders()
@@ -56,7 +88,16 @@ export default function TablePage() {
             if (r.ok) {
                 r.json().then(
                     json => {
-                        console.log(json)
+                        let startDate = new Date(json.startDate)
+                        let endDate = new Date(json.endDate)
+                        let years = [];
+                        for (let i=startDate.getFullYear(); i<=endDate.getFullYear(); i++) {
+                            years.push(i);
+                        }
+                        setYearSelectionOptions(years)
+                        if (yearSelection === null) {
+                            setYearSelection(years[0]);
+                        }
                     }
                 )
             } else {
@@ -65,7 +106,7 @@ export default function TablePage() {
         })
 
 
-    }, [itemType, sortBy, searchTerm, pageSize, currentPage]);
+    }, [itemType, yearSelection, monthSelection, dateTypeSelection, sortBy, searchTerm, pageSize, currentPage]);
 
 
     return (
@@ -105,12 +146,23 @@ export default function TablePage() {
                 </div>
                 <div>
                     {dateTypeSelection === "Year" || dateTypeSelection === "Month" ?
-                        <Selector
-                            style={{minWidth: "400px"}}
-                            items={yearSelectionOptions}
-                            selectedValue={yearSelection}
-                            setSelectedValue={setYearSelection}
-                        /> :
+                        <Stack style={{alignItems: "center", gap: "15px"}}>
+                            <Selector
+                                style={{width: "400px"}}
+                                items={yearSelectionOptions}
+                                selectedValue={yearSelection}
+                                setSelectedValue={setYearSelection}
+                                isNumber={true}
+                            />
+                            {dateTypeSelection === "Month" ?
+                                <Selector
+                                    style={{minWidth: "800px"}}
+                                    items={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
+                                    selectedValue={monthSelection}
+                                    setSelectedValue={setMonthSelection}
+                                /> :<div></div>
+                            }
+                        </Stack> :
                         <div>
                         {dateTypeSelection === "Custom" ?
                             <div>
@@ -121,9 +173,9 @@ export default function TablePage() {
                     }
                 </div>
             </Stack>
-            {/*<div>*/}
-            {/*    {tableData.map((object, key) => <div>{key} {object.artistName}</div>)}*/}
-            {/*</div>*/}
+            <div>
+                {tableData.map((object, key) => <div>{key} {object.artistName}</div>)}
+            </div>
             <div style={{display: "flex", justifyContent: "center"}}>
                 <TablePagination
                     sx={{".MuiTablePagination-displayedRows": {minWidth: "150px"}}}

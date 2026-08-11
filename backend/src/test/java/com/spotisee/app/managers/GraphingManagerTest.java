@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -106,8 +105,8 @@ public class GraphingManagerTest {
                         "album",
                         "artist",
                         ItemType.SONG,
-                        getStart(),
-                        getEnd())));
+                        Timestamp.valueOf(getStart()),
+                        Timestamp.valueOf(getEnd()))));
     }
 
     private LocalDateTime getStart() {

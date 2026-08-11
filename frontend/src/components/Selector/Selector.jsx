@@ -1,13 +1,21 @@
 import "./Selector.css";
 import {Divider, Link, Typography} from "@mui/material";
 
-export default function Selector({style, items, selectedValue, setSelectedValue}) {
+export default function Selector({style, items, selectedValue, setSelectedValue, isNumber}) {
+
 
     const handleOnClick = (event) => {
-        setSelectedValue(event.target.innerHTML);
+        if (isNumber) {
+            setSelectedValue(Number.parseInt(event.target.innerHTML));
+        } else {
+            setSelectedValue(event.target.innerHTML);
+        }
     }
 
     const getIndex = () => {
+        if (items === null) {
+            return 0
+        }
         let index = items.indexOf(selectedValue);
         if (index === -1) return 0;
         return index
@@ -34,6 +42,7 @@ export default function Selector({style, items, selectedValue, setSelectedValue}
             </div>
             {items.map((item) =>
                     <Typography
+                        defaultValue={item}
                         underline="none"
                         onClick={handleOnClick}
                         className="selectorButton"

@@ -18,3 +18,12 @@ export function logout() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("username");
 }
+
+export function toDateString(date) {
+    let out = date.toISOString()
+               .replace("T", " ")
+               .replace("Z", "")
+               .replace("+", " ");
+    console.log("converting", date, out);
+    return out;
+}
