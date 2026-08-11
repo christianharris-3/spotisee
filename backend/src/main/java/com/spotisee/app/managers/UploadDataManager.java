@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -31,6 +32,10 @@ public class UploadDataManager {
 
     public List<UploadInfo> getUploads(long userId) {
         return uploadDao.getUploadInfo(userId);
+    }
+
+    public Optional<UploadInfo> getUpload(long uploadId) {
+        return uploadDao.getSingleUploadInfo(uploadId);
     }
 
     public void deleteUpload(long uploadId) {

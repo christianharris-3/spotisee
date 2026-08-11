@@ -99,7 +99,7 @@ public class GraphingManager {
             List<GraphLinePointData> outputPoints = new ArrayList<>();
 
             int songPointer = 0;
-            int currentMonth = songs.get(0).getEndTime().getMonthValue();
+            int currentMonth = songs.get(0).getEndTime().;
 
             while (songPointer < songs.size()) {
                 int cummulative_value = 0;
