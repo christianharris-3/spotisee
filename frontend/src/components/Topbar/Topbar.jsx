@@ -1,5 +1,5 @@
-import "./topbar.css";
-import LogoBw from "../svg/LogoBw.jsx";
+import "./Topbar.css";
+import LogoBw from "../Svg/LogoBw.jsx";
 import {useNavigate} from "react-router-dom";
 import {AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, SvgIcon, Toolbar, Typography} from "@mui/material";
 import UserAvatar from "../UserAvatar.jsx";

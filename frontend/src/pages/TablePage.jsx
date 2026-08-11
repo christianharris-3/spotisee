@@ -1,13 +1,19 @@
-import {Paper, TablePagination, ToggleButton, ToggleButtonGroup} from "@mui/material";
+import {Paper, Stack, TablePagination, ToggleButton, ToggleButtonGroup} from "@mui/material";
 import {useEffect, useState} from "react";
 import {getHeaders} from "../utils/utils.js";
 import SearchBox from "../components/SearchBox/SearchBox.jsx";
+import Selector from "../components/Selector/Selector.jsx";
 
 export default function TablePage() {
 
     const [itemType, setItemType] = useState("songs");
     const [sortBy, setSortBy] = useState("totalMsPlayed");
     const [searchTerm, setSearchTerm] = useState("");
+
+    const [dateTypeSelection, setDateTypeSelection] = useState("All");
+
+    const [yearSelectionOptions, setYearSelectionOptions] = useState([]);
+    const [yearSelection, setYearSelection] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(100);
@@ -23,14 +29,18 @@ export default function TablePage() {
         setPageSize(parseInt(event.target.value, 10))
     }
 
+    const getUploadId = () => {
+        return localStorage.getItem('activeUploadId')
+    }
+
     useEffect(() => {
         const params = new URLSearchParams({
             searchTerm: searchTerm,
             pageSize: pageSize,
-            pageIndex: currentPage-1,
+            pageIndex: currentPage,
             sortBy: sortBy
         });
-        fetch(`/api/aggregate/${itemType}/${localStorage.getItem('activeUploadId')}?${params}`, {
+        fetch(`/api/aggregate/${itemType}/${getUploadId()}?${params}`, {
             method: "GET",
             headers: getHeaders()
         })
@@ -39,6 +49,21 @@ export default function TablePage() {
                 console.log(json);
                 setTableData(json);
             })
+        fetch(`/api/upload-data/${getUploadId()}`, {
+            method: "GET",
+            headers: getHeaders()
+        }).then(r => {
+            if (r.ok) {
+                r.json().then(
+                    json => {
+                        console.log(json)
+                    }
+                )
+            } else {
+                console.log("ERROR: upload data info failed to load, id: ", getUploadId())
+            }
+        })
+
 
     }, [itemType, sortBy, searchTerm, pageSize, currentPage]);
 
@@ -70,10 +95,35 @@ export default function TablePage() {
                     <ToggleButton value="listens">Total Listens</ToggleButton>
                 </ToggleButtonGroup>
             </div>
-            <div>Date Entry Here</div>
-            <div>
-                {tableData.map((object, key) => <div>{key} {object.artistName}</div>)}
-            </div>
+            <Stack style={{alignItems: "center"}}>
+                <div style={{minWidth: "400px", width: "30%", padding: "12px"}}>
+                    <Selector
+                        items={["All", "Year", "Month", "Custom"]}
+                        selectedValue={dateTypeSelection}
+                        setSelectedValue={setDateTypeSelection}
+                    />
+                </div>
+                <div>
+                    {dateTypeSelection === "Year" || dateTypeSelection === "Month" ?
+                        <Selector
+                            style={{minWidth: "400px"}}
+                            items={yearSelectionOptions}
+                            selectedValue={yearSelection}
+                            setSelectedValue={setYearSelection}
+                        /> :
+                        <div>
+                        {dateTypeSelection === "Custom" ?
+                            <div>
+                                <input type="date"></input>
+                            </div> : <></>
+                        }
+                        </div>
+                    }
+                </div>
+            </Stack>
+            {/*<div>*/}
+            {/*    {tableData.map((object, key) => <div>{key} {object.artistName}</div>)}*/}
+            {/*</div>*/}
             <div style={{display: "flex", justifyContent: "center"}}>
                 <TablePagination
                     sx={{".MuiTablePagination-displayedRows": {minWidth: "150px"}}}

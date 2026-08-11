@@ -1,0 +1,36 @@
+
+.selectorBar {
+    position: relative;
+    display: flex;
+    border: 1px solid var(--color-border);
+    /*padding: 4px;*/
+    border-radius: 10px;
+}
+
+.selectorButton {
+    text-align: center;
+    padding: 4px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    cursor: pointer;
+    user-select: none;
+    z-index: 1;
+}
+
+.selectorButton:hover {
+    color: var(--color-primary)
+}
+
+.selectorHighlight {
+    display: block;
+    position: absolute;
+    height: 100%;
+    z-index: 0;
+    border-radius: 10px;
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border-strong);
+    transition: left;
+    cursor: pointer;
+    transition-duration: 0.25s;
+}
