@@ -24,6 +24,5 @@ export function toDateString(date) {
                .replace("T", " ")
                .replace("Z", "")
                .replace("+", " ");
-    console.log("converting", date, out);
     return out;
 }

@@ -13,13 +13,17 @@ export default function TablePage() {
     const [dateTypeSelection, setDateTypeSelection] = useState("All");
 
     const [yearSelectionOptions, setYearSelectionOptions] = useState([]);
-    const [yearSelection, setYearSelection] = useState(null);
+    const [yearSelection, setYearSelection] = useState(2020);
     const [monthSelection, setMonthSelection] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(100);
 
     const [tableData, setTableData] = useState([]);
+
+    const fullMonthList = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const [monthSelectionOptions, setMonthSelectionOptions] = useState(fullMonthList);
+    const [monthListData, setMonthListData] = useState(null);
 
 
     const handleMovePage = (event, newPage) => {
@@ -41,18 +45,23 @@ export default function TablePage() {
                 endDate: new Date(2040, 0)
             }
         } else if (dateTypeSelection === "Year") {
-            console.log(yearSelection)
             return {
                 startDate: new Date(yearSelection, 0),
-                endDate: new Date(yearSelection+1, 0)
+                endDate: new Date(yearSelection + 1, 0)
             }
         } else if (dateTypeSelection === "Month") {
+            let currentMonth = fullMonthList.indexOf(monthSelection);
+            let followingMonth = currentMonth + 1
+            let followingYear = yearSelection
+            if (currentMonth === 11) {
+                followingMonth = 0
+                followingYear = yearSelection + 1
+            }
             return {
-                startDate: new Date(yearSelection, monthSelection),
-                endDate: new Date(yearSelection, monthSelection+1)
+                startDate: new Date(yearSelection, currentMonth),
+                endDate: new Date(followingYear, followingMonth)
             }
         }
-
 
 
         return {
@@ -61,6 +70,63 @@ export default function TablePage() {
         }
     }
 
+    // Year+month date availability info
+    useEffect(() => {
+        const params = new URLSearchParams({
+            searchTerm: searchTerm,
+            itemType: itemType,
+        })
+        fetch(`/api/aggregation-info/${getUploadId()}?${params}`, {
+            method: "GET",
+            headers: getHeaders()
+        }).then(r => {
+            if (r.ok) {
+                r.json().then(json => {
+                    let years = [];
+                    let monthListData = {}
+                    json.forEach((item) => {
+                        years.push(item.year);
+                        monthListData[item.year] = item.months.map(
+                            monthIndex => fullMonthList[monthIndex-1]
+                        );
+                    })
+                    setYearSelectionOptions(years);
+                    setMonthListData(monthListData);
+                })
+            } else {
+                console.log("ERROR: upload data info failed to load, id: ", getUploadId())
+            }
+        })
+    }, [itemType, searchTerm]);
+
+    // update month list when changing tabs
+    useEffect(() => {
+        if (monthListData !== null) {
+            setMonthSelectionOptions(monthListData[yearSelection])
+            if (!(monthSelection in monthListData[yearSelection]) && monthListData[yearSelection].length > 0) {
+                setMonthSelection(monthListData[0])
+            }
+        }
+    }, [monthListData, yearSelection, dateTypeSelection]);
+
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [itemType, searchTerm, dateTypeSelection, yearSelection, monthSelection]);
+
+    // useEffect(() => {
+        // fetch(`/api/songdates/${getUploadId()}`, {
+        //     method: "GET",
+        //     headers: getHeaders()
+        // }).then(r => {
+        //     if (r.ok) {
+        //         r.json().then(json => {
+        //             console.log(json)
+        //         })
+        //     }
+        // })
+    // }, [itemType, searchTerm, dateTypeSelection]);
+
+    // Load Table Data
     useEffect(() => {
         let dates = getDateRange();
         const params = new URLSearchParams({
@@ -71,43 +137,18 @@ export default function TablePage() {
             pageIndex: currentPage,
             sortBy: sortBy
         });
-        console.log("calling", params.toString(), dates)
         fetch(`/api/aggregate/${itemType}/${getUploadId()}?${params}`, {
             method: "GET",
             headers: getHeaders()
         })
-            .then(r => r.json())
-            .then(json => {
-                console.log(json);
-                setTableData(json);
+            .then(r => {
+                if (r.ok) {
+                    r.json().then(json => {
+                        setTableData(json);
+                    })
+                }
             })
-        fetch(`/api/upload-data/${getUploadId()}`, {
-            method: "GET",
-            headers: getHeaders()
-        }).then(r => {
-            if (r.ok) {
-                r.json().then(
-                    json => {
-                        let startDate = new Date(json.startDate)
-                        let endDate = new Date(json.endDate)
-                        let years = [];
-                        for (let i=startDate.getFullYear(); i<=endDate.getFullYear(); i++) {
-                            years.push(i);
-                        }
-                        setYearSelectionOptions(years)
-                        if (yearSelection === null) {
-                            setYearSelection(years[0]);
-                        }
-                    }
-                )
-            } else {
-                console.log("ERROR: upload data info failed to load, id: ", getUploadId())
-            }
-        })
-
-
     }, [itemType, yearSelection, monthSelection, dateTypeSelection, sortBy, searchTerm, pageSize, currentPage]);
-
 
     return (
         <div className="page">
@@ -148,7 +189,7 @@ export default function TablePage() {
                     {dateTypeSelection === "Year" || dateTypeSelection === "Month" ?
                         <Stack style={{alignItems: "center", gap: "15px"}}>
                             <Selector
-                                style={{width: "400px"}}
+                                style={{minWidth: `calc(100px * ${yearSelectionOptions.length})`}}
                                 items={yearSelectionOptions}
                                 selectedValue={yearSelection}
                                 setSelectedValue={setYearSelection}
@@ -156,19 +197,19 @@ export default function TablePage() {
                             />
                             {dateTypeSelection === "Month" ?
                                 <Selector
-                                    style={{minWidth: "800px"}}
-                                    items={["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}
+                                    style={{minWidth: `calc(60px * ${monthSelectionOptions.length})`}}
+                                    items={monthSelectionOptions}
                                     selectedValue={monthSelection}
                                     setSelectedValue={setMonthSelection}
-                                /> :<div></div>
+                                /> : <div></div>
                             }
                         </Stack> :
                         <div>
-                        {dateTypeSelection === "Custom" ?
-                            <div>
-                                <input type="date"></input>
-                            </div> : <></>
-                        }
+                            {dateTypeSelection === "Custom" ?
+                                <div>
+                                    <input type="date"></input>
+                                </div> : <></>
+                            }
                         </div>
                     }
                 </div>
