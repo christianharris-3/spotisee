@@ -1,7 +1,7 @@
 import "./Selector.css";
 import {Divider, Link, Typography} from "@mui/material";
 
-export default function Selector({style, items, selectedValue, setSelectedValue, isNumber}) {
+export default function Selector({style, items, selectedValue, setSelectedValue, isNumber, noItemsString}) {
 
 
     const handleOnClick = (event) => {
@@ -28,7 +28,7 @@ export default function Selector({style, items, selectedValue, setSelectedValue,
     }
 
     if (getSize() === 0) {
-        return <div>no items found</div>
+        return <div>{noItemsString}</div>
     }
 
 

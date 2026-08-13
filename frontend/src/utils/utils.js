@@ -26,3 +26,7 @@ export function toDateString(date) {
                .replace("+", " ");
     return out;
 }
+
+export function getUploadId() {
+    return localStorage.getItem('activeUploadId')
+}
