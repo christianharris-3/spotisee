@@ -1,0 +1,39 @@
+
+.titleRow {
+    background-color: var(--color-table-header);
+}
+
+.titleRow th {
+    margin: 0;
+    padding: 8px;
+    font-weight: bold;
+}
+
+.titleRow th:first-child {
+    border-radius: 5px 0 0 0;
+}
+.titleRow th:last-child {
+    border-radius: 0 5px 0 0;
+}
+
+.bodyRow {
+    background-color: var(--color-table-row);
+}
+
+.bodyRow:hover {
+    background-color: var(--color-table-row-hover);
+}
+
+.tableBody tr:nth-child(odd) {
+    background-color: var(--color-table-row-alt);
+}
+
+.tableBody tr:nth-child(odd):hover {
+    background-color: var(--color-table-row-hover);
+}
+
+.mainTable {
+    table-layout: fixed;
+    margin-top: 16px;
+    width: 100%;
+}

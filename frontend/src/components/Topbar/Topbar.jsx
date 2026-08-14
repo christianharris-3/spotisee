@@ -1,5 +1,5 @@
-import "./topbar.css";
-import LogoBw from "../svg/LogoBw.jsx";
+import "./Topbar.css";
+import LogoBw from "../Svg/LogoBw.jsx";
 import {useNavigate} from "react-router-dom";
 import {AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, SvgIcon, Toolbar, Typography} from "@mui/material";
 import UserAvatar from "../UserAvatar.jsx";
@@ -43,9 +43,15 @@ export default function Topbar() {
     return (
         <AppBar position="static" style={{height: 50}}>
             <div className="top-divider">
-                <div style={{width: "20%", display: "flex", gap: 12, height: "100%", alignItems: "center"}}>
-                    <LogoBw width={50} height={20} homeOnClick={true}/>
-                    <span>Spotisee</span>
+                <div style={{display: "flex", gap: "50px"}}>
+                    <div style={{minWidth: "100px", display: "flex", gap: 12, height: "100%", alignItems: "center"}}>
+                        <LogoBw width={50} height={20} homeOnClick={true}/>
+                        <span style={{fontWeight: "bold"}}>Spotisee</span>
+                    </div>
+                    <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                        <Button style={{color: "white"}} onClick={()=>navigate("/profile")}>Profile</Button>
+                        <Button style={{color: "white"}} onClick={()=>navigate("/table")}>Table</Button>
+                    </div>
                 </div>
                 {loggedIn ?
                     <Box style={{display: "flex", alignItems: "center", gap: "8px"}}>

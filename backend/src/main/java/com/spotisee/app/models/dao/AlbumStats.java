@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class AlbumStats {
     private long uploadId;
+    private int preSearchIndex;
     private String albumName;
     private String artistName;
     private long totalMsPlayed;

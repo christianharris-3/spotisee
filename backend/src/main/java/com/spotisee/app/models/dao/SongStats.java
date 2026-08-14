@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class SongStats {
+    private int preSearchIndex;
     private long uploadId;
     private String trackName;
     private String albumName;

@@ -41,6 +41,7 @@ public class Spotisee extends Application<AppConfiguration> {
         AuthDao authDao = jdbi.onDemand(AuthDao.class);
         SelectionDao selectionDao = jdbi.onDemand(SelectionDao.class);
         GraphingDao graphingDao = jdbi.onDemand(GraphingDao.class);
+        SongMetaDataDao songMetaDataDao = jdbi.onDemand(SongMetaDataDao.class);
 
         // Managers
         UploadDataManager uploadDataManager = new UploadDataManager(uploadDao, authDao);
@@ -48,6 +49,7 @@ public class Spotisee extends Application<AppConfiguration> {
         UserValidationManager userValidationManager = new UserValidationManager(authDao);
         SelectionManager selectionManager = new SelectionManager(selectionDao);
         GraphingManager graphingManager = new GraphingManager(graphingDao, selectionManager);
+        SongMetaDataManager songMetaDataManager = new SongMetaDataManager(songMetaDataDao);
 
         // Auth
         SpotiseeAuthenticator authenticator = new SpotiseeAuthenticator(authDao);
@@ -70,5 +72,6 @@ public class Spotisee extends Application<AppConfiguration> {
         environment.jersey().register(new UploadDataResource(uploadDataManager, userValidationManager));
         environment.jersey().register(new SelectionResource(selectionManager, userValidationManager));
         environment.jersey().register(new GraphingResource(graphingManager, userValidationManager));
+        environment.jersey().register(new SongMetaDataResource(songMetaDataManager, userValidationManager));
     }
 }

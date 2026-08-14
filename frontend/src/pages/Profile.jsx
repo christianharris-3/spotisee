@@ -63,11 +63,11 @@ export default function Profile() {
         setTriggerDataReload(triggerDataReload + 1);
     }
 
-    function formatDate(dateList) {
-        if (dateList === null) {
+    function formatDate(unixTime) {
+        if (unixTime === null) {
             return "Unknown"
         }
-        let date = new Date(...dateList);
+        let date = new Date(unixTime);
         let month = date.toLocaleString("en-gb", {month: "short"});
         return `${month} ${date.getFullYear()}`
     }
@@ -111,7 +111,7 @@ export default function Profile() {
                                 <div>Loading...</div>:
                             <TableContainer>
                                 <Table>
-                                    <TableHead>
+                                    <TableHead sx={{background: ""}}>
                                         <TableRow>
                                             <TableCell>Active</TableCell>
                                             <TableCell>Name</TableCell>

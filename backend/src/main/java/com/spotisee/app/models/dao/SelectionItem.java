@@ -4,6 +4,7 @@ import com.spotisee.app.models.enums.ItemType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,6 +19,6 @@ public class SelectionItem {
 
     private ItemType itemType;
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private Timestamp startDate;
+    private Timestamp endDate;
 }

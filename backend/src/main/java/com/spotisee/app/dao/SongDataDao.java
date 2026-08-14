@@ -30,19 +30,24 @@ public interface SongDataDao {
 
     @RegisterBeanMapper(SongStats.class)
     @SqlQuery("""
-                SELECT uploadId, trackName,
-                SUM(msPlayed) AS totalMsPlayed,
-                albumName,
-                artistName,
-                COUNT(*) AS count,
-                SUM(msPlayed >=  30000) AS listens,
-                SUM(skipped) as skips
-                FROM SongView
-                WHERE (:uploadId = uploadId) AND
-                (:start < endTime) AND (endTime < :end) AND
-                (trackName LIKE :searchTerm OR albumName LIKE :searchTerm OR artistName LIKE :searchTerm)
-                GROUP BY uploadId, trackName, albumName, artistName
-                ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
+                WITH baseData AS (
+                    SELECT uploadId, trackName, albumName, artistName,
+                    SUM(msPlayed) AS totalMsPlayed,
+                    COUNT(*) AS count,
+                    SUM(msPlayed >=  30000) AS listens,
+                    SUM(skipped) as skips
+                    FROM SongView
+                    WHERE (:uploadId = uploadId) AND
+                    (:start < endTime) AND (endTime < :end)
+                    GROUP BY uploadId, trackName, albumName, artistName
+                ), indexedData AS (
+                    SELECT uploadId, trackName, albumName, artistName, totalMsPlayed, count, listens, skips,
+                    ROW_NUMBER() OVER (ORDER BY <sortPrimary> DESC, <sortSecondary> DESC) AS preSearchIndex
+                    FROM baseData
+                )
+                SELECT uploadId, trackName, albumName, artistName, totalMsPlayed, count, listens, skips, preSearchIndex
+                FROM indexedData
+                WHERE (trackName LIKE :searchTerm OR albumName LIKE :searchTerm OR artistName LIKE :searchTerm)
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<SongStats> collectSongStats(
@@ -58,18 +63,24 @@ public interface SongDataDao {
 
     @RegisterBeanMapper(AlbumStats.class)
     @SqlQuery("""
-                SELECT uploadId, albumName,
-                SUM(msPlayed) AS totalMsPlayed,
-                artistName,
-                COUNT(*) AS count,
-                SUM(msPlayed >=  30000) AS listens,
-                SUM(skipped) as skips
-                FROM SongView
-                WHERE (:uploadId = uploadId) AND
-                (:start < endTime) AND (endTime < :end) AND
-                (albumName LIKE :searchTerm OR artistName LIKE :searchTerm)
-                GROUP BY uploadId, albumName, artistName
-                ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
+                WITH baseData AS (
+                    SELECT uploadId, albumName, artistName,
+                    SUM(msPlayed) AS totalMsPlayed,
+                    COUNT(*) AS count,
+                    SUM(msPlayed >=  30000) AS listens,
+                    SUM(skipped) as skips
+                    FROM SongView
+                    WHERE (:uploadId = uploadId) AND
+                    (:start < endTime) AND (endTime < :end)
+                    GROUP BY uploadId, albumName, artistName
+                ), indexedData AS (
+                    SELECT uploadId, albumName, artistName, totalMsPlayed, count, listens, skips,
+                    ROW_NUMBER() OVER (ORDER BY <sortPrimary> DESC, <sortSecondary> DESC) AS preSearchIndex
+                    FROM baseData
+                )
+                SELECT uploadId, albumName, artistName, totalMsPlayed, count, listens, skips, preSearchIndex
+                FROM indexedData
+                WHERE (albumName LIKE :searchTerm OR artistName LIKE :searchTerm)
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<AlbumStats> collectAlbumStats(
@@ -85,17 +96,24 @@ public interface SongDataDao {
 
     @RegisterBeanMapper(ArtistStats.class)
     @SqlQuery("""
-                SELECT uploadId, artistName,
-                SUM(msPlayed) AS totalMsPlayed,
-                COUNT(*) AS count,
-                SUM(msPlayed >=  30000) AS listens,
-                SUM(skipped) as skips
-                FROM SongView
-                WHERE (:uploadId = uploadId) AND
-                (:start < endTime) AND (endTime < :end) AND
-                (artistName LIKE :searchTerm)
-                GROUP BY uploadId, artistName
-                ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
+                WITH baseData AS (
+                    SELECT uploadId, artistName,
+                    SUM(msPlayed) AS totalMsPlayed,
+                    COUNT(*) AS count,
+                    SUM(msPlayed >=  30000) AS listens,
+                    SUM(skipped) as skips
+                    FROM SongView
+                    WHERE (:uploadId = uploadId) AND
+                    (:start < endTime) AND (endTime < :end)
+                    GROUP BY uploadId, artistName
+                ), indexedData AS (
+                    SELECT uploadId, artistName, totalMsPlayed, count, listens, skips,
+                    ROW_NUMBER() OVER (ORDER BY <sortPrimary> DESC, <sortSecondary> DESC) AS preSearchIndex
+                    FROM baseData
+                )
+                SELECT uploadId, artistName, totalMsPlayed, count, listens, skips, preSearchIndex
+                FROM indexedData
+                WHERE (artistName LIKE :searchTerm)
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<ArtistStats> collectArtistStats(
@@ -111,16 +129,23 @@ public interface SongDataDao {
 
     @RegisterBeanMapper(CombinedStats.class)
     @SqlQuery("""
-                SELECT uploadId,
-                SUM(msPlayed) AS totalMsPlayed,
-                COUNT(*) AS count,
-                SUM(msPlayed >=  30000) AS listens,
-                SUM(skipped) as skips
-                FROM SongView
-                WHERE (:uploadId = uploadId) AND
-                (:start < endTime) AND (endTime < :end)
-                GROUP BY uploadId
-                ORDER BY <sortPrimary> DESC, <sortSecondary> DESC
+                WITH baseData AS (
+                    SELECT uploadId,
+                    SUM(msPlayed) AS totalMsPlayed,
+                    COUNT(*) AS count,
+                    SUM(msPlayed >=  30000) AS listens,
+                    SUM(skipped) as skips
+                    FROM SongView
+                    WHERE (:uploadId = uploadId) AND
+                    (:start < endTime) AND (endTime < :end)
+                    GROUP BY uploadId
+                ), indexedData AS (
+                    SELECT uploadId, totalMsPlayed, count, listens, skips,
+                    ROW_NUMBER() OVER (ORDER BY <sortPrimary> DESC, <sortSecondary> DESC) AS preSearchIndex
+                    FROM baseData
+                )
+                SELECT uploadId, totalMsPlayed, count, listens, skips, preSearchIndex
+                FROM indexedData
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<CombinedStats> collectAllStats(

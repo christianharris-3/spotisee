@@ -2,12 +2,13 @@ package com.spotisee.app.models.dao;
 
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
 public class SongInfo {
     private long uploadId;
-    private LocalDateTime endTime;
+    private Timestamp endTime;
     private int msPlayed;
     private String trackName;
     private String albumName;

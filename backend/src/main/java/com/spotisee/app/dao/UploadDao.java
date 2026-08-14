@@ -9,6 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface UploadDao {
 
@@ -26,6 +27,20 @@ public interface UploadDao {
             ORDER BY Upload.uploadId;
             """)
     List<UploadInfo> getUploadInfo(@Bind("userId") long userId);
+
+    @RegisterBeanMapper(UploadInfo.class)
+    @SqlQuery("""
+            SELECT Upload.uploadId,
+                   Upload.uploadName,
+                   COUNT(UploadItem.uploadItemId) as itemCount,
+                   MIN(UploadItem.timestamp) as startDate,
+                   MAX(UploadItem.timestamp) as endDate
+            FROM Upload LEFT JOIN UploadItem
+            ON Upload.uploadid = UploadItem.uploadId
+            WHERE (Upload.uploadId = :uploadId)
+            GROUP BY Upload.uploadId;
+            """)
+    Optional<UploadInfo> getSingleUploadInfo(@Bind("uploadId") long uploadId);
 
     @SqlUpdate("""
             UPDATE Upload

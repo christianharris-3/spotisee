@@ -1,0 +1,36 @@
+@import url("../../styles/globals.css");
+
+.searchBox {
+    border-width: 1px;
+    padding: 0 8px;
+    border-radius: 15px;
+    border-color: var(--color-border);
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.searchBox:hover {
+    border-color: var(--color-border-hover)
+}
+
+.searchBox > input {
+    flex-grow: 1;
+    padding: 8px;
+    outline: 0;
+}
+
+.searchBox > svg {
+    padding-left: 4px;
+    font-size: 26px;
+    color: var(--color-text-secondary);
+}
+
+.clearButton {
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.clearButton:hover {
+    background-color: var(--color-background);
+}

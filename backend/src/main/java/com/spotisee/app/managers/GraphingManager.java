@@ -165,26 +165,26 @@ public class GraphingManager {
     private List<SingleDataPoint> getSongs(SelectionItem selectionItem) {
         return switch (selectionItem.getItemType()) {
             case SONG -> graphingDao.getSongPoints(
-                    Timestamp.valueOf(selectionItem.getStartDate()),
-                    Timestamp.valueOf(selectionItem.getEndDate()),
+                    selectionItem.getStartDate(),
+                    selectionItem.getEndDate(),
                     selectionItem.getTrackName(),
                     selectionItem.getAlbumName(),
                     selectionItem.getArtistName()
             );
             case ALBUM -> graphingDao.getAlbumPoints(
-                    Timestamp.valueOf(selectionItem.getStartDate()),
-                    Timestamp.valueOf(selectionItem.getEndDate()),
+                    selectionItem.getStartDate(),
+                    selectionItem.getEndDate(),
                     selectionItem.getAlbumName(),
                     selectionItem.getArtistName()
             );
             case ARTIST -> graphingDao.getArtistPoints(
-                    Timestamp.valueOf(selectionItem.getStartDate()),
-                    Timestamp.valueOf(selectionItem.getEndDate()),
+                    selectionItem.getStartDate(),
+                    selectionItem.getEndDate(),
                     selectionItem.getArtistName()
             );
             case COMBINED -> graphingDao.getCombinedPoints(
-                    Timestamp.valueOf(selectionItem.getStartDate()),
-                    Timestamp.valueOf(selectionItem.getEndDate())
+                    selectionItem.getStartDate(),
+                    selectionItem.getEndDate()
             );
         };
     }
@@ -203,8 +203,8 @@ public class GraphingManager {
                 selectionItem.getAlbumName(),
                 selectionItem.getArtistName(),
                 selectionItem.getItemType(),
-                selectionItem.getStartDate(),
-                selectionItem.getEndDate(),
+                selectionItem.getStartDate().toLocalDateTime(),
+                selectionItem.getEndDate().toLocalDateTime(),
                 outputPoints
         );
     }
@@ -221,8 +221,8 @@ public class GraphingManager {
     }
 
     private List<Instant> getDataPointTimestamps(SelectionResponse selection, SelectionItem selectionItem) {
-        LocalDateTime startDate = selectionItem.getStartDate();
-        LocalDateTime endDate = selectionItem.getEndDate().toLocalDate().atStartOfDay().plusDays(1L);
+        LocalDateTime startDate = selectionItem.getStartDate().toLocalDateTime();
+        LocalDateTime endDate = selectionItem.getEndDate().toLocalDateTime().toLocalDate().atStartOfDay().plusDays(1L);
         List<Instant> dataPointTimestamps = new ArrayList<>();
 
         Duration interval;

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
 
@@ -41,6 +42,17 @@ public class UploadDataResource {
     public Response listUploads(@Auth User user) {
         List<UploadInfo> uploadInfo = uploadDataManager.getUploads(user.getUserId());
         return Response.ok(uploadInfo).build();
+    }
+
+    @GET
+    @Path("/{uploadId}")
+    public Response getUpload(@Auth User user, @PathParam("uploadId") long uploadId) {
+        userValidationManager.validateUserHasUpload(user, uploadId);
+        Optional<UploadInfo> uploadInfo = uploadDataManager.getUpload(uploadId);
+        if (uploadInfo.isEmpty()) {
+            return Response.noContent().build();
+        }
+        return Response.ok(uploadInfo.get()).build();
     }
 
     @PUT

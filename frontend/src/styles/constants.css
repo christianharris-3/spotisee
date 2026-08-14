@@ -1,4 +1,5 @@
 /* styles/tokens.css */
+@import "tailwindcss";
 
 :root {
     /* ========================================
@@ -44,6 +45,21 @@
     --color-border: #e5e1d8;
     --color-border-light: #eeeae2;
     --color-border-strong: #cfc9bc;
+    --color-border-hover: #8e8981;
+
+    /* Table */
+    --color-table-header: #d1be69;
+    --color-table-header-text: #ffffff;
+
+    --color-table-row: #ffffff;
+    --color-table-row-alt: #faf9f5;
+    --color-table-row-hover: #f4f0e2;
+
+    --color-table-border: #e5e1d8;
+    --color-table-border-strong: #d5cfbf;
+
+    --color-table-selected: #fff1f1;
+    --color-table-selected-border: #e9bcbc;
 
 
     /* ========================================
