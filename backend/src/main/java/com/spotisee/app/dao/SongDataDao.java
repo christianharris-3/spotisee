@@ -146,7 +146,6 @@ public interface SongDataDao {
                 )
                 SELECT uploadId, totalMsPlayed, count, listens, skips, preSearchIndex
                 FROM indexedData
-                WHERE (artistName LIKE :searchTerm)
                 LIMIT :pageSize OFFSET :pageOffset;
             """)
     List<CombinedStats> collectAllStats(

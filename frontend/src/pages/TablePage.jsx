@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from "react";
 import {getHeaders, getUploadId, toDateString} from "../utils/utils.js";
 import SearchBox from "../components/SearchBox/SearchBox.jsx";
 import {DateSelector} from "../components/DateSelector.jsx";
-import SongDataTable from "../components/SongDataTable.jsx";
+import SongDataTable from "../components/SongDataTable/SongDataTable.jsx";
 
 export default function TablePage() {
 
@@ -63,14 +63,13 @@ export default function TablePage() {
                 if (r.ok) {
                     r.json().then(json => {
                         setTableData(json);
-                        console.log(json);
                     })
                 }
             })
     }, [itemType, startDate, endDate, sortBy, searchTerm, pageSize, currentPage]);
 
     return (
-        <div className="page">
+        <div className="page" style={{marginInline: "40px"}}>
             <div style={{paddingTop: "30px", display: "flex", gap: "10px"}}>
                 <SearchBox setSearchText={updateSearchTerm}/>
                 <ToggleButtonGroup
@@ -104,10 +103,10 @@ export default function TablePage() {
                           setCurrentPage={setCurrentPage}/>
             <div>
                 <SongDataTable tableData = {tableData}/>
-                {/*{tableData.map((object, key) => <div>{key} {object.artistName}</div>)}*/}
             </div>
             <div style={{display: "flex", justifyContent: "center"}}>
                 <TablePagination
+                    component="div"
                     sx={{".MuiTablePagination-displayedRows": {minWidth: "150px"}}}
                     count={10000}
                     onPageChange={handleMovePage}

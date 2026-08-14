@@ -25,3 +25,12 @@
     font-size: 26px;
     color: var(--color-text-secondary);
 }
+
+.clearButton {
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.clearButton:hover {
+    background-color: var(--color-background);
+}

@@ -111,7 +111,7 @@ export default function Profile() {
                                 <div>Loading...</div>:
                             <TableContainer>
                                 <Table>
-                                    <TableHead>
+                                    <TableHead sx={{background: ""}}>
                                         <TableRow>
                                             <TableCell>Active</TableCell>
                                             <TableCell>Name</TableCell>
