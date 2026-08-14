@@ -49,6 +49,8 @@ export const DateSelector = forwardRef((
         let newMonth = updateMonthList(monthListData, newYear);
         updateDateRange(dateTypeSelection, newYear, newMonth);
         setYearSelection(newYear);
+
+
     }
     const updateMonthSelection = (newMonth) => {
         setCurrentPage(0);

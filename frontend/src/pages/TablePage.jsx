@@ -3,6 +3,7 @@ import {useEffect, useRef, useState} from "react";
 import {getHeaders, getUploadId, toDateString} from "../utils/utils.js";
 import SearchBox from "../components/SearchBox/SearchBox.jsx";
 import {DateSelector} from "../components/DateSelector.jsx";
+import SongDataTable from "../components/SongDataTable.jsx";
 
 export default function TablePage() {
 
@@ -14,7 +15,7 @@ export default function TablePage() {
     const [endDate, setEndDate] = useState(new Date(2040, 0));
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(100);
+    const [pageSize, setPageSize] = useState(20);
 
     const [tableData, setTableData] = useState([]);
 
@@ -102,7 +103,8 @@ export default function TablePage() {
                           setEndDate={setEndDate}
                           setCurrentPage={setCurrentPage}/>
             <div>
-                {tableData.map((object, key) => <div>{key} {object.artistName}</div>)}
+                <SongDataTable tableData = {tableData}/>
+                {/*{tableData.map((object, key) => <div>{key} {object.artistName}</div>)}*/}
             </div>
             <div style={{display: "flex", justifyContent: "center"}}>
                 <TablePagination
@@ -111,7 +113,7 @@ export default function TablePage() {
                     onPageChange={handleMovePage}
                     page={currentPage}
                     rowsPerPage={pageSize}
-                    rowsPerPageOptions={[20, 50, 100]}
+                    rowsPerPageOptions={[10, 20, 50, 100]}
                     showFirstButton={true}
                     showLastButton={true}
                     onRowsPerPageChange={handleChangePageSize}/>
