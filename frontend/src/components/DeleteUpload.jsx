@@ -2,9 +2,12 @@ import {getHeaders} from "../utils/utils.js";
 import {Button, CircularProgress} from "@mui/material";
 import {Delete} from "@mui/icons-material";
 import {useState} from "react";
+import ConfirmDialog from "./ConfirmDialog.jsx";
 
-export default function DeleteUpload({uploadId, triggerDataReload}) {
+export default function DeleteUpload({uploadId, uploadName, triggerDataReload}) {
     const [buttonLoading, setButtonLoading] = useState(false);
+
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
     function deleteUpload() {
         setButtonLoading(true)
@@ -21,8 +24,13 @@ export default function DeleteUpload({uploadId, triggerDataReload}) {
             <div>
                 <CircularProgress size="30px"/>
             </div> :
-            <Button onClick={deleteUpload} style={{width: "fit-content", minWidth: "fit-content"}}>
+            <Button onClick={() => setDeleteConfirmationOpen(true)} style={{width: "fit-content", minWidth: "fit-content"}}>
                 <Delete color="error"/>
             </Button>}
+            <ConfirmDialog open={deleteConfirmationOpen}
+                           setOpen={setDeleteConfirmationOpen}
+                           onDelete={deleteUpload}
+                           message={`Deleting Collection ${uploadName}`}
+            />
         </div>)
 }

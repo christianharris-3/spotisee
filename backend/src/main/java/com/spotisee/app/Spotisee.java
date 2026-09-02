@@ -11,16 +11,41 @@ import com.spotisee.app.resources.*;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.core.Application;
+import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
 import io.dropwizard.db.ManagedDataSource;
+import io.github.cdimascio.dotenv.Dotenv;
+import org.apache.commons.text.StringSubstitutor;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Spotisee extends Application<AppConfiguration> {
 
     public static void main(String[] args) throws Exception {
         new Spotisee().run(args);
+    }
+
+    @Override
+    public void initialize(Bootstrap<AppConfiguration> bootstrap) {
+        Dotenv dotenv = Dotenv.configure().load();
+        Map<String, String> envMap = new HashMap<>();
+
+        for (String property : List.of("DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD")) {
+            envMap.put(property, dotenv.get(property));
+        }
+
+
+        bootstrap.setConfigurationSourceProvider(
+                new SubstitutingSourceProvider(
+                        bootstrap.getConfigurationSourceProvider(),
+                        new StringSubstitutor(envMap, "${", "}"))
+        );
     }
 
     @Override

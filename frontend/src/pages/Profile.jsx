@@ -10,7 +10,7 @@ import {
     Typography
 } from "@mui/material";
 import UserAvatar from "../components/UserAvatar.jsx";
-import {getHeaders, logout} from "../utils/utils.js";
+import {getHeaders, getHeadersJson, logout} from "../utils/utils.js";
 import {useNavigate} from "react-router-dom";
 import UploadSection from "../components/UploadSection.jsx";
 import {useEffect, useState} from "react";
@@ -59,6 +59,20 @@ export default function Profile() {
         }
     }, [selectedUpload]);
 
+    function saveTitleText(newUploadName, row) {
+        return fetch("/api/upload-data/"+row.uploadId, {
+            method: "PUT",
+            headers: getHeadersJson(),
+            body: JSON.stringify({uploadName: newUploadName})
+        }).then(r => {
+            if (r.ok) {
+                row.uploadName = newUploadName;
+                return true
+            }
+            return false;
+        })
+    }
+
     function runTriggerDataReload() {
         setTriggerDataReload(triggerDataReload + 1);
     }
@@ -75,6 +89,8 @@ export default function Profile() {
     function uploadSelected(uploadId) {
         setSelectedUpload(uploadId);
     }
+
+
 
 
 
@@ -128,13 +144,18 @@ export default function Profile() {
                                                     <Checkbox checked={selectedUpload === row.uploadId} onClick={() => {uploadSelected(row.uploadId)}} size="large"/>
                                                 </TableCell>
                                                 <TableCell sx={{padding: "1px", paddingTop: "8px", width: "270px"}}>
-                                                    <EditableText row={row} triggerDataReload={runTriggerDataReload}/>
+                                                    <EditableText
+                                                        defaultText={row.uploadName}
+                                                        row={row}
+                                                        saveFunc={saveTitleText}
+                                                        htmlKey={`uploadNameTextbox${row.uploadId}`}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>{row.itemCount}</TableCell>
                                                 <TableCell>{formatDate(row.startDate)}</TableCell>
                                                 <TableCell>{formatDate(row.endDate)}</TableCell>
                                                 <TableCell sx={{width: "50px"}}>
-                                                    <DeleteUpload uploadId={row.uploadId} triggerDataReload={runTriggerDataReload}/>
+                                                    <DeleteUpload uploadId={row.uploadId} uploadName={row.uploadName} triggerDataReload={runTriggerDataReload}/>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

@@ -18,7 +18,7 @@ import java.util.Optional;
 public interface SelectionDao {
     @SqlUpdate("""
             INSERT INTO Selection (userId, selectionTitle, graphType, pointFrequency, pointFrequencyDays, daysSummedPerPoint)
-            VALUES (:userId, :selectionTitle, :graphType, :pointFrequency, :pointFrequency, :daysSummedPerPoint);
+            VALUES (:userId, :selectionTitle, :graphType, :pointFrequency, :pointFrequencyDays, :daysSummedPerPoint);
             """)
     @GetGeneratedKeys
     long createSelection(

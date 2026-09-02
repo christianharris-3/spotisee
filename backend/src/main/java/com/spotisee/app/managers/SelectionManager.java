@@ -40,7 +40,20 @@ public class SelectionManager {
     }
 
     public List<Selection> getSelections(long userId) {
-        return selectionDao.getUserSelections(userId);
+        List<Selection> selections = selectionDao.getUserSelections(userId);
+        if (selections.isEmpty()) {
+            createSelection(
+                        userId,
+                    "New Graph",
+                    GraphType.LISTENS,
+                    PointFrequency.WEEKLY,
+                    null,
+                    null
+            );
+            selections = selectionDao.getUserSelections(userId);
+        }
+        return selections;
+
     }
 
     public void updateSelection(

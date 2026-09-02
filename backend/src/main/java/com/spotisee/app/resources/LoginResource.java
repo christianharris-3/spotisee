@@ -4,6 +4,7 @@ import com.spotisee.app.config.SpotiseeAuthenticator;
 import com.spotisee.app.dao.AuthDao;
 import com.spotisee.app.models.User;
 import com.spotisee.app.models.requests.LoginRequest;
+import com.spotisee.app.models.requests.TokenLifelineCheck;
 import com.spotisee.app.models.response.ErrorResponse;
 import com.spotisee.app.models.response.TokenResponse;
 import io.dropwizard.auth.Auth;
@@ -52,8 +53,14 @@ public class LoginResource {
         return Response.accepted().build();
     }
 
-    @GET
-    public Response lifelineCheck(@Auth User user) {
-        return Response.ok(user).build();
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response lifelineCheck(@Valid @NotNull TokenLifelineCheck tokenLifelineCheck) {
+        Optional<User> user = spotiseeAuthenticator.authenticate(tokenLifelineCheck.getToken());
+
+        if (user.isEmpty()) {
+            return Response.accepted(null).build();
+        }
+        return Response.ok(user.get()).build();
     }
 }

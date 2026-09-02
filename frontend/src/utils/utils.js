@@ -40,5 +40,13 @@ export function msPlayedToString(msPlayed) {
         return `${minutes}m ${seconds}s`
     }
     return `${hours}h ${minutes}m ${seconds}s`
+}
 
+export function validateResponse(response, navigate) {
+    if (response.ok) {
+        return true;
+    } else if (response.status === 401) {
+        navigate("/login");
+    }
+    return false;
 }

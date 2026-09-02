@@ -9,9 +9,9 @@ server:
 
 database:
   driverClass: com.mysql.cj.jdbc.Driver
-  user: chris
-  password: password
-  url: jdbc:mysql://localhost:3306/Spotisee?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+  url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?ssl-mode=REQUIRED&serverTimezone=UTC&allowPublicKeyRetrieval=true
   maxSize: 10
 
 logging:

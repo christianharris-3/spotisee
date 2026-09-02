@@ -1,5 +1,6 @@
 package com.spotisee.app.managers;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spotisee.app.dao.AuthDao;
@@ -28,6 +29,7 @@ public class UploadDataManager {
         this.uploadDao = uploadDao;
         this.authDao = authDao;
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
     }
 
     public List<UploadInfo> getUploads(long userId) {
@@ -59,9 +61,9 @@ public class UploadDataManager {
         long uploadId = uploadDao.createUpload(userId, uploadName);
 
         ZipEntry entry;
-
-        try {
+//        try {
             while ((entry = zipInputStream.getNextEntry()) != null) {
+                log.info("entry: {}", entry);
 
                 if (entry.isDirectory()) continue;
                 JsonNode json = objectMapper.readValue(zipInputStream, JsonNode.class);
@@ -73,12 +75,12 @@ public class UploadDataManager {
                 }
                 log.info("Finished Loading {}", entry.getName());
             }
-        } catch (IOException e) {
-            log.error("Thing threw an error : {} : {}", e.getMessage(), e.getLocalizedMessage());
-            if (!Objects.equals(e.getMessage(), "Stream closed")) {
-                throw e;
-            }
-        }
+//        } catch (IOException e) {
+//            log.error("Thing threw an error : {} : {}", e.getMessage(), e.getLocalizedMessage());
+//            if (!Objects.equals(e.getMessage(), "Stream closed")) {
+//                throw e;
+//            }
+//        }
         return uploadId;
     }
 

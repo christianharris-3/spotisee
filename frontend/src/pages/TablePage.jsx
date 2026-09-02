@@ -1,11 +1,15 @@
-import {Paper, Stack, TablePagination, ToggleButton, ToggleButtonGroup} from "@mui/material";
+import {Button, Dialog, Drawer, Paper, Stack, TablePagination, ToggleButton, ToggleButtonGroup} from "@mui/material";
 import {useEffect, useRef, useState} from "react";
-import {getHeaders, getUploadId, toDateString} from "../utils/utils.js";
+import {getHeaders, getUploadId, toDateString, validateResponse} from "../utils/utils.js";
 import SearchBox from "../components/SearchBox/SearchBox.jsx";
 import {DateSelector} from "../components/DateSelector.jsx";
 import SongDataTable from "../components/SongDataTable/SongDataTable.jsx";
+import {useNavigate} from "react-router-dom";
+import {ViewSidebar, ViewSidebarSharp} from "@mui/icons-material";
+import GraphSelectionsUI from "../components/GraphSelectionsUI.jsx";
 
 export default function TablePage() {
+    const navigate = useNavigate();
 
     const [itemType, setItemType] = useState("songs");
     const [sortBy, setSortBy] = useState("totalMsPlayed");
@@ -21,6 +25,7 @@ export default function TablePage() {
 
     const dateSelector = useRef(null);
 
+    const [graphSelectionOpen, setGraphSelectionOpen] = useState(false);
 
     const handleMovePage = (event, newPage) => {
         setCurrentPage(newPage);
@@ -60,7 +65,7 @@ export default function TablePage() {
             headers: getHeaders()
         })
             .then(r => {
-                if (r.ok) {
+                if (validateResponse(r, navigate)) {
                     r.json().then(json => {
                         setTableData(json);
                     })
@@ -94,6 +99,11 @@ export default function TablePage() {
                     <ToggleButton value="totalMsPlayed">Listen Time</ToggleButton>
                     <ToggleButton value="listens">Total Listens</ToggleButton>
                 </ToggleButtonGroup>
+                <Button variant="outlined"
+                    onClick={() => {setGraphSelectionOpen(true)}}>
+                    Graphing
+                </Button>
+                <GraphSelectionsUI isOpen={graphSelectionOpen} setIsOpen={setGraphSelectionOpen}/>
             </div>
             <DateSelector ref={dateSelector}
                           startDate={startDate}

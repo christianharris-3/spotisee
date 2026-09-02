@@ -1,6 +1,7 @@
 import {Box, Button, Link, Paper, Stack, TextField, Typography} from "@mui/material";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {validateResponse} from "../utils/utils.js";
 
 export default function Register() {
     const [username, setUsername] = useState("");
@@ -49,7 +50,7 @@ export default function Register() {
     return (
         <div className="page">
             <div style={{paddingTop: "25vh"}}>
-                <Paper style={{width: "400px", margin: "auto", padding: "20px 50px", borderRadius: "12px"}}>
+                <Paper style={{maxWidth: "400px", margin: "auto", padding: "20px 50px", borderRadius: "12px"}}>
                     <form>
                         <Stack spacing={2}>
                             <Typography variant="h5">Register</Typography>
@@ -63,7 +64,7 @@ export default function Register() {
                                        }}></TextField>
                             <TextField id="outlined-password"
                                        label="Password"
-                                       type="password1"
+                                       type="password"
                                        value={password1}
                                        error={passwordsNotEqualError || passwordEmptyError}
                                        helperText={passwordEmptyError? "Password can't be empty": ""}
@@ -72,7 +73,7 @@ export default function Register() {
                                        }}></TextField>
                             <TextField id="outlined-password"
                                        label="Repeat Password"
-                                       type="password2"
+                                       type="password"
                                        value={password2}
                                        error={passwordsNotEqualError || passwordEmptyError}
                                        onChange={(e) => {

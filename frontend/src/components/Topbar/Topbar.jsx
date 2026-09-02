@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom";
 import {AppBar, Avatar, Box, Button, IconButton, Menu, MenuItem, SvgIcon, Toolbar, Typography} from "@mui/material";
 import UserAvatar from "../UserAvatar.jsx";
 import {useState} from "react";
-import {getHeaders, logout} from "../../utils/utils.js";
+import {getHeaders, getHeadersJson, logout} from "../../utils/utils.js";
 
 export default function Topbar() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -21,7 +21,15 @@ export default function Topbar() {
     }
 
     function lifeLine() {
-        fetch("/api/auth", {method: "GET", headers: getHeaders()}).then(
+        let authToken = localStorage.getItem("authToken");
+        if (authToken === undefined || authToken === null) {
+            return;
+        }
+        fetch("/api/auth", {
+            method: "POST",
+            headers: getHeadersJson(),
+            body: JSON.stringify({token: authToken})}
+        ).then(
             r => {
                 if (r.ok) {
                     r.json().then(
